@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HanimeliApp.API", "HanimeliApp.API\HanimeliApp.API.csproj", "{9365FDE0-61B1-4158-BA22-64E2FB1F68D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HanimeliApp.Domain", "HanimeliApp.Domain\HanimeliApp.Domain.csproj", "{41DC2E09-329D-4FD1-B8D7-FA3A08E95D33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HanimeliApp.Application", "HanimeliApp.Application\HanimeliApp.Application.csproj", "{E6835A7E-6746-47A1-ADB0-0589EA76737C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HanimeliApp.Infrastructure", "HanimeliApp.Infrastructure\HanimeliApp.Infrastructure.csproj", "{8AACBA08-6002-447B-9F6F-DAC91CBB11A8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{8615005E-C93D-463A-971B-D44C7F1F2E06}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9365FDE0-61B1-4158-BA22-64E2FB1F68D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9365FDE0-61B1-4158-BA22-64E2FB1F68D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9365FDE0-61B1-4158-BA22-64E2FB1F68D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9365FDE0-61B1-4158-BA22-64E2FB1F68D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41DC2E09-329D-4FD1-B8D7-FA3A08E95D33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41DC2E09-329D-4FD1-B8D7-FA3A08E95D33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41DC2E09-329D-4FD1-B8D7-FA3A08E95D33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41DC2E09-329D-4FD1-B8D7-FA3A08E95D33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6835A7E-6746-47A1-ADB0-0589EA76737C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6835A7E-6746-47A1-ADB0-0589EA76737C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6835A7E-6746-47A1-ADB0-0589EA76737C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6835A7E-6746-47A1-ADB0-0589EA76737C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AACBA08-6002-447B-9F6F-DAC91CBB11A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AACBA08-6002-447B-9F6F-DAC91CBB11A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AACBA08-6002-447B-9F6F-DAC91CBB11A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AACBA08-6002-447B-9F6F-DAC91CBB11A8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E6835A7E-6746-47A1-ADB0-0589EA76737C} = {8615005E-C93D-463A-971B-D44C7F1F2E06}
+		{41DC2E09-329D-4FD1-B8D7-FA3A08E95D33} = {8615005E-C93D-463A-971B-D44C7F1F2E06}
+		{8AACBA08-6002-447B-9F6F-DAC91CBB11A8} = {8615005E-C93D-463A-971B-D44C7F1F2E06}
+	EndGlobalSection
+EndGlobal

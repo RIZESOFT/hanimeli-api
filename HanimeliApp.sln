@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HanimeliApp.Infrastructure"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{8615005E-C93D-463A-971B-D44C7F1F2E06}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HanimeliApp.Admin.Api", "HanimeliApp.Admin.Api\HanimeliApp.Admin.Api.csproj", "{B19EDE4A-0A84-4B7F-818F-C5F12C393E5E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{8AACBA08-6002-447B-9F6F-DAC91CBB11A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8AACBA08-6002-447B-9F6F-DAC91CBB11A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8AACBA08-6002-447B-9F6F-DAC91CBB11A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B19EDE4A-0A84-4B7F-818F-C5F12C393E5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B19EDE4A-0A84-4B7F-818F-C5F12C393E5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B19EDE4A-0A84-4B7F-818F-C5F12C393E5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B19EDE4A-0A84-4B7F-818F-C5F12C393E5E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E6835A7E-6746-47A1-ADB0-0589EA76737C} = {8615005E-C93D-463A-971B-D44C7F1F2E06}

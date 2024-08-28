@@ -5,10 +5,15 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="13.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
+    </ItemGroup>
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-      <ProjectReference Include="..\HanimeliApp.Domain\HanimeliApp.Domain.csproj" />
+        <ProjectReference Include="..\HanimeliApp.Infrastructure\HanimeliApp.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

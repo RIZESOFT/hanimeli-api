@@ -35,7 +35,7 @@ namespace HanimeliApp.Application.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SizeFinder.Application.Resources.Resources.tr", typeof(Resources_tr).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("HanimeliApp.Application.Resources.Resources.tr", typeof(Resources_tr).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

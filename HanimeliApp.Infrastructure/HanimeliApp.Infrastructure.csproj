@@ -7,10 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\HanimeliApp.Application\HanimeliApp.Application.csproj" />
+        <ProjectReference Include="..\HanimeliApp.Domain\HanimeliApp.Domain.csproj" />
     </ItemGroup>
 </Project>

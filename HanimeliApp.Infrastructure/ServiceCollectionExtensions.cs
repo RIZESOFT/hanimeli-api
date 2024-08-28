@@ -19,7 +19,7 @@ namespace HanimeliApp.Infrastructure
 
             var domainAssembly = Assembly.GetAssembly(typeof(IEntity))!;
 
-            var mainEntities = domainAssembly.GetTypes().Where(t => t.Namespace!.Equals("SizeFinder.Domain.Entities")).ToList();
+            var mainEntities = domainAssembly.GetTypes().Where(t => t.Namespace!.Equals("HanimeliApp.Domain.Entities")).ToList();
 
             foreach (var mainEntity in mainEntities)
             {

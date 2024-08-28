@@ -8,14 +8,9 @@
 
     <ItemGroup>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\HanimeliApp.Application\HanimeliApp.Application.csproj" />
+        <ProjectReference Include="..\HanimeliApp.Application\HanimeliApp.Application.csproj" />
     </ItemGroup>
-
 </Project>

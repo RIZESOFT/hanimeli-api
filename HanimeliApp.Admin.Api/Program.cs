@@ -70,8 +70,10 @@ builder.Services.AddAuthentication(options =>
     });
 
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("UserPolicy", policy =>
-        policy.RequireRole("User", "Admin"));
+    .AddPolicy("AdminPolicy", policy =>
+        policy.RequireRole("Admin"))
+    .AddPolicy("B2BPolicy", policy =>
+        policy.RequireRole("B2B", "Admin"));
 
 var app = builder.Build();
 

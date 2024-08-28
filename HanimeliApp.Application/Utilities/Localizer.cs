@@ -21,7 +21,7 @@ namespace HanimeliApp.Application.Utilities
 
         public Localizer()
         {
-            _resourceManager = new ResourceManager("SizeFinder.Application.Resources.Resource", Assembly.GetAssembly(this.GetType())!);
+            _resourceManager = new ResourceManager("HanimeliApp.Application.Resources.Resources", Assembly.GetAssembly(this.GetType())!);
         }
 
         public string? Translate(string key, string? culture = null)

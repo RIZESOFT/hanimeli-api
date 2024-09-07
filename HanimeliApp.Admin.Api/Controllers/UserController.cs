@@ -27,7 +27,7 @@ public class UserController : AdminBaseController
     [HttpPost]
     public async Task<Result<UserModel>> CreateUser([FromBody] CreateUserRequest request)
     {
-        var result = await _userService.CreateUser(request);
+        var result = await _userService.Create(request);
         return Result.AsSuccess(result);
     }
 }

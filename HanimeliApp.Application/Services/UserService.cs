@@ -15,23 +15,17 @@ using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegiste
 
 namespace HanimeliApp.Application.Services
 {
-    public class UserService : ServiceBase
+    public class UserService : ServiceBase<User, UserModel, CreateUserRequest, UpdateUserRequest>
     {
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
-        public UserService(IUnitOfWork unitOfWork, IConfiguration configuration, IMapper mapper) : base(unitOfWork)
+        public UserService(IUnitOfWork unitOfWork, IConfiguration configuration, IMapper mapper) : base(unitOfWork, mapper)
         {
             _configuration = configuration;
             _mapper = mapper;
         }
-
-        public async Task<User?> GetUserById(int id)
-        {
-            var user = await UnitOfWork.Repository<User>().GetAsync(x => x.Id == id);
-            return user;
-        }
-        
-        public async Task<UserModel> CreateUser(CreateUserRequest request)
+       
+        public override async Task<UserModel> Create(CreateUserRequest request)
         {
             var userRepository = UnitOfWork.Repository<User>();
             var user = await userRepository.GetAsync(x => x.Email == request.Email || x.Phone == request.Phone);
@@ -52,7 +46,7 @@ namespace HanimeliApp.Application.Services
             return userModel;
         }
 
-        public async Task<UserModel> UpdateUser(int userId, UpdateUserRequest request)
+        public override async Task<UserModel> Update(int userId, UpdateUserRequest request)
         {
             var userRepository = UnitOfWork.Repository<User>();
             var user = await userRepository.GetAsync(x => x.Id == userId);

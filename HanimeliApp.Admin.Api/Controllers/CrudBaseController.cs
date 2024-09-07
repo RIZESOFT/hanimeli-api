@@ -1,82 +1,53 @@
-﻿using AutoMapper;
-using HanimeliApp.Application.Exceptions;
-using HanimeliApp.Application.Models;
-using HanimeliApp.Domain.Dtos.User;
+﻿using HanimeliApp.Application.Models;
+using HanimeliApp.Application.Services.Abstract;
 using HanimeliApp.Domain.Entities.Abstract;
-using HanimeliApp.Domain.Models;
-using HanimeliApp.Domain.Repositories;
-using HanimeliApp.Domain.UnitOfWorks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HanimeliApp.Admin.Api.Controllers;
 
-public class CrudBaseController<TEntity, TModel, TCreateRequest, TUpdateRequest> : AdminBaseController where TEntity : BaseEntity<int>
+public class CrudBaseController<TService, TEntity, TModel, TCreateRequest, TUpdateRequest> : AdminBaseController
+    where TService : ServiceBase<TEntity, TModel, TCreateRequest, TUpdateRequest>
+    where TEntity : BaseEntity<int>
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IGenericRepository<TEntity> _baseRepository;
-    private readonly IMapper _mapper;
+    private readonly TService _service;
 
-    public CrudBaseController(IUnitOfWork unitOfWork, IMapper mapper)
+    public CrudBaseController(TService service)
     {
-        _mapper = mapper;
-        _baseRepository = unitOfWork.Repository<TEntity>();
-        _unitOfWork = unitOfWork;
+        _service = service;
     }
-    
+
     [HttpGet("{id}")]
-    public virtual async Task<Result<TModel>> GetById(int id)
+    public async Task<Result<TModel>> GetById(int id)
     {
-        var entity = await _baseRepository.GetAsync(x => x.Id == id);
-        var model = _mapper.Map<TModel>(entity);
+        var model = await _service.GetById(id);
         return Result.AsSuccess(model);
     }
-    
+
     [HttpGet]
-    public virtual async Task<Result<List<TModel>>> GetList([FromQuery] int pageNumber)
+    public async Task<Result<List<TModel>>> GetList([FromQuery] int pageNumber)
     {
-        var paging = new EntityPaging();
-        paging.PageNumber = pageNumber;
-        paging.ItemCount = 25;
-        var entity = await _baseRepository.GetListAsync(x => true, x => x.OrderBy(y => y.Id), paging: paging);
-        var model = _mapper.Map<List<TModel>>(entity);
-        return Result.AsSuccess(model);
+        var models = await _service.GetList(pageNumber, 25);
+        return Result.AsSuccess(models);
     }
-    
+
     [HttpPost]
-    public virtual async Task<Result<TModel>> Create([FromBody] TCreateRequest request)
+    public async Task<Result<TModel>> Create([FromBody] TCreateRequest request)
     {
-        var entity = _mapper.Map<TEntity>(request);
-        await _baseRepository.InsertAsync(entity);
-        await _unitOfWork.SaveChangesAsync();
-        var model = _mapper.Map<TModel>(entity);
+        var model = await _service.Create(request);
         return Result.AsSuccess(model);
     }
-    
+
     [HttpPut("{id:int}")]
-    public virtual async Task<Result<TModel>> Update(int id, [FromBody] TUpdateRequest request)
+    public async Task<Result<TModel>> Update(int id, [FromBody] TUpdateRequest request)
     {
-        var entity = await _baseRepository.GetAsync(x => x.Id == id);
-
-        if (entity == null)
-            throw ValidationExceptions.RecordNotFound;
-            
-        _mapper.Map(request, entity);
-        _baseRepository.Update(entity);
-        await _unitOfWork.SaveChangesAsync();
-        var model = _mapper.Map<TModel>(entity);
+        var model = await _service.Update(id, request);
         return Result.AsSuccess(model);
     }
-    
-    [HttpDelete("{id:int}")]
-    public virtual async Task<Result> Delete(int id)
-    {
-        var entity = await _baseRepository.GetAsync(x => x.Id == id);
 
-        if (entity == null)
-            throw ValidationExceptions.RecordNotFound;
-        
-        _baseRepository.HardDelete(entity);
-        await _unitOfWork.SaveChangesAsync();
+    [HttpDelete("{id:int}")]
+    public async Task<Result> Delete(int id)
+    {
+        await _service.Delete(id);
         return Result.AsSuccess();
     }
 }

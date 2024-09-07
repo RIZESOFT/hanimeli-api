@@ -9,7 +9,11 @@ namespace HanimeliApp.Application
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            var domainServices = Assembly.GetAssembly(typeof(ServiceBase))!.GetTypes().Where(t => t.IsSubclassOf(typeof(ServiceBase))).ToList();
+            var domainServices = Assembly.GetAssembly(typeof(ServiceBase<,,,>))!
+                .GetTypes()
+                .Where(t => !t.IsAbstract && t.BaseType != null && t.BaseType.IsGenericType && 
+                            t.BaseType.GetGenericTypeDefinition() == typeof(ServiceBase<,,,>))
+                .ToList();
 
             foreach (var service in domainServices)
             {

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HanimeliApp.Application.Services;
 using HanimeliApp.Domain.Dtos.Food;
 using HanimeliApp.Domain.Entities;
 using HanimeliApp.Domain.Models.Food;
@@ -6,9 +7,9 @@ using HanimeliApp.Domain.UnitOfWorks;
 
 namespace HanimeliApp.Admin.Api.Controllers;
 
-public class FoodController : CrudBaseController<Food, FoodModel, CreateFoodRequest, UpdateFoodRequest>
+public class FoodController : CrudBaseController<FoodService, Food, FoodModel, CreateFoodRequest, UpdateFoodRequest>
 {
-    public FoodController(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+    public FoodController(FoodService service) : base(service)
     {
     }
 }

@@ -5,8 +5,8 @@ name: Build and deploy ASP.Net Core app to Azure Web App - hanimeli-admin-api
 
 on:
   push:
-    branches:
-      - master
+    tags:
+      - 'admin-v*' 
   workflow_dispatch:
 
 jobs:
@@ -22,16 +22,16 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build ./HanimeliApp.Admin.Api/HanimeliApp.Admin.Api.csproj --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish ./HanimeliApp.Admin.Api/HanimeliApp.Admin.Api.csproj -c Release -o ${{env.DOTNET_ROOT}}/adminapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          name: admin-app
+          path: ${{env.DOTNET_ROOT}}/adminapp
 
   deploy:
     runs-on: ubuntu-latest
@@ -46,7 +46,7 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: .net-app
+          name: admin-app
       
       - name: Login to Azure
         uses: azure/login@v2

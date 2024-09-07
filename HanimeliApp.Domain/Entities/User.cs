@@ -10,9 +10,11 @@ public class User : BaseEntity<int>
     public string Phone { get; set; }
     public string Password { get; set; }
     public string Role { get; set; }
+    public int? CookId { get; set; }
 
     // Navigation Properties
     public ICollection<Order> Orders { get; set; }
     public ICollection<Favorite> Favorites { get; set; }
     public ICollection<Address> Addresses { get; set; }
+    public Cook? Cook { get; set; }
 }

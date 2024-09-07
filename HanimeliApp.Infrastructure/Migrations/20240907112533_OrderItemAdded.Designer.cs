@@ -3,6 +3,7 @@ using System;
 using HanimeliApp.Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HanimeliApp.Infrastructure.Migrations
 {
     [DbContext(typeof(HanimeliDbContext))]
-    partial class HanimeliDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240907112533_OrderItemAdded")]
+    partial class OrderItemAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -395,9 +398,6 @@ namespace HanimeliApp.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CookId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
@@ -423,8 +423,6 @@ namespace HanimeliApp.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CookId");
 
                     b.ToTable("Users");
                 });
@@ -620,15 +618,6 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.Navigation("Menu");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("HanimeliApp.Domain.Entities.User", b =>
-                {
-                    b.HasOne("HanimeliApp.Domain.Entities.Cook", "Cook")
-                        .WithMany()
-                        .HasForeignKey("CookId");
-
-                    b.Navigation("Cook");
                 });
 
             modelBuilder.Entity("HanimeliApp.Domain.Entities.Cart", b =>

@@ -15,6 +15,7 @@ public class HanimeliDbContext : DbContext
     public DbSet<Order> Orders { get; set; }
     public DbSet<Rating> Ratings { get; set; }
     public DbSet<Favorite> Favorites { get; set; }
+    public DbSet<Food> Foods { get; set; }
     
     public HanimeliDbContext(DbContextOptions<HanimeliDbContext> options) : base(options)
     {

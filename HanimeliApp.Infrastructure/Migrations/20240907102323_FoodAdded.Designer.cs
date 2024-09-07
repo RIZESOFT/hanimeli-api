@@ -3,6 +3,7 @@ using System;
 using HanimeliApp.Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HanimeliApp.Infrastructure.Migrations
 {
     [DbContext(typeof(HanimeliDbContext))]
-    partial class HanimeliDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240907102323_FoodAdded")]
+    partial class FoodAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -123,10 +126,15 @@ namespace HanimeliApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
 
                     b.ToTable("Beverages");
                 });
@@ -167,9 +175,6 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.Property<int>("Count")
                         .HasColumnType("integer");
 
-                    b.Property<int>("FoodId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("MenuId")
                         .HasColumnType("integer");
 
@@ -178,8 +183,6 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.HasIndex("BeverageId");
 
                     b.HasIndex("CartId");
-
-                    b.HasIndex("FoodId");
 
                     b.HasIndex("MenuId");
 
@@ -278,10 +281,15 @@ namespace HanimeliApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
 
                     b.ToTable("Menus");
                 });
@@ -317,39 +325,6 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("HanimeliApp.Domain.Entities.OrderItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("BeverageId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("FoodId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("MenuId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BeverageId");
-
-                    b.HasIndex("FoodId");
-
-                    b.HasIndex("MenuId");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("OrderItem");
                 });
 
             modelBuilder.Entity("HanimeliApp.Domain.Entities.Rating", b =>
@@ -395,9 +370,6 @@ namespace HanimeliApp.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CookId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
@@ -423,8 +395,6 @@ namespace HanimeliApp.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CookId");
 
                     b.ToTable("Users");
                 });
@@ -485,6 +455,13 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("HanimeliApp.Domain.Entities.Beverage", b =>
+                {
+                    b.HasOne("HanimeliApp.Domain.Entities.Order", null)
+                        .WithMany("Beverages")
+                        .HasForeignKey("OrderId");
+                });
+
             modelBuilder.Entity("HanimeliApp.Domain.Entities.CartItem", b =>
                 {
                     b.HasOne("HanimeliApp.Domain.Entities.Beverage", "Beverage")
@@ -494,14 +471,8 @@ namespace HanimeliApp.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("HanimeliApp.Domain.Entities.Cart", "Cart")
-                        .WithMany("CartItems")
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HanimeliApp.Domain.Entities.Food", "Food")
                         .WithMany()
-                        .HasForeignKey("FoodId")
+                        .HasForeignKey("CartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -514,8 +485,6 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.Navigation("Beverage");
 
                     b.Navigation("Cart");
-
-                    b.Navigation("Food");
 
                     b.Navigation("Menu");
                 });
@@ -547,6 +516,13 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("HanimeliApp.Domain.Entities.Menu", b =>
+                {
+                    b.HasOne("HanimeliApp.Domain.Entities.Order", null)
+                        .WithMany("Menus")
+                        .HasForeignKey("OrderId");
+                });
+
             modelBuilder.Entity("HanimeliApp.Domain.Entities.Order", b =>
                 {
                     b.HasOne("HanimeliApp.Domain.Entities.Address", "DeliveryAddress")
@@ -564,35 +540,6 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.Navigation("DeliveryAddress");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("HanimeliApp.Domain.Entities.OrderItem", b =>
-                {
-                    b.HasOne("HanimeliApp.Domain.Entities.Beverage", "Beverage")
-                        .WithMany()
-                        .HasForeignKey("BeverageId");
-
-                    b.HasOne("HanimeliApp.Domain.Entities.Food", "Food")
-                        .WithMany()
-                        .HasForeignKey("FoodId");
-
-                    b.HasOne("HanimeliApp.Domain.Entities.Menu", "Menu")
-                        .WithMany()
-                        .HasForeignKey("MenuId");
-
-                    b.HasOne("HanimeliApp.Domain.Entities.Order", "Order")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Beverage");
-
-                    b.Navigation("Food");
-
-                    b.Navigation("Menu");
-
-                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("HanimeliApp.Domain.Entities.Rating", b =>
@@ -622,20 +569,6 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("HanimeliApp.Domain.Entities.User", b =>
-                {
-                    b.HasOne("HanimeliApp.Domain.Entities.Cook", "Cook")
-                        .WithMany()
-                        .HasForeignKey("CookId");
-
-                    b.Navigation("Cook");
-                });
-
-            modelBuilder.Entity("HanimeliApp.Domain.Entities.Cart", b =>
-                {
-                    b.Navigation("CartItems");
-                });
-
             modelBuilder.Entity("HanimeliApp.Domain.Entities.Cook", b =>
                 {
                     b.Navigation("Ratings");
@@ -648,7 +581,9 @@ namespace HanimeliApp.Infrastructure.Migrations
 
             modelBuilder.Entity("HanimeliApp.Domain.Entities.Order", b =>
                 {
-                    b.Navigation("OrderItems");
+                    b.Navigation("Beverages");
+
+                    b.Navigation("Menus");
                 });
 
             modelBuilder.Entity("HanimeliApp.Domain.Entities.User", b =>

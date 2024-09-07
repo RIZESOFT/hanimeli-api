@@ -28,7 +28,6 @@ namespace HanimeliApp.Application.Middlewares
                 httpContext.Response.StatusCode = (int)httpStatusCode;
                 if(httpStatusCode != HttpStatusCode.NoContent)
                     await httpContext.Response.WriteAsJsonAsync(Result.AsFailure(exception));
-                throw; // Bu throw RequestResponseLogMiddleware'in exception yakalayabilmesi için eklenmiştir.
             }
         }
 

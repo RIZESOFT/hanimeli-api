@@ -95,7 +95,7 @@ namespace HanimeliApp.Application.Services
 
             var token = GenerateToken(claims);
 
-            var result = new UserLoginResultModel(user.Name, user.LastName, user.Email, token)
+            var result = new UserLoginResultModel(user.Name, user.LastName, user.Email, user.Role, token)
             {
                 PhoneNumber = user.Phone
             };

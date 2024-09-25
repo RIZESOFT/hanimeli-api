@@ -11,61 +11,56 @@ namespace HanimeliApp.Application.Services;
 
 public class MenuService : ServiceBase<Menu, MenuModel, CreateMenuRequest, UpdateMenuRequest>
 {
-    private readonly IMapper _mapper;
-    private readonly IUnitOfWork _unitOfWork;
-    
     public MenuService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
     {
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
     }
     
     public override async Task<MenuModel> Create(CreateMenuRequest request)
     {
-        var entity = _mapper.Map<Menu>(request);
+        var entity = Mapper.Map<Menu>(request);
         
         if (request.FoodIds != null && request.FoodIds.Any())
         {
-            var foods = await _unitOfWork.Repository<Food>().GetListAsync(x => request.FoodIds.Contains(x.Id));
+            var foods = await UnitOfWork.Repository<Food>().GetListAsync(x => request.FoodIds.Contains(x.Id));
             entity.Foods = foods;
         }
 
         if (request.BeverageIds != null && request.BeverageIds.Any())
         {
-            var beverages = await _unitOfWork.Repository<Beverage>().GetListAsync(x => request.BeverageIds.Contains(x.Id));
+            var beverages = await UnitOfWork.Repository<Beverage>().GetListAsync(x => request.BeverageIds.Contains(x.Id));
             entity.Beverages = beverages;
         }
         
-        await _unitOfWork.Repository<Menu>().InsertAsync(entity);
-        await _unitOfWork.SaveChangesAsync();
-        var model = _mapper.Map<MenuModel>(entity);
+        await UnitOfWork.Repository<Menu>().InsertAsync(entity);
+        await UnitOfWork.SaveChangesAsync();
+        var model = Mapper.Map<MenuModel>(entity);
         return model;
     }
 
     public override async Task<MenuModel> Update(int id, UpdateMenuRequest request)
     {
-        var entity = await _unitOfWork.Repository<Menu>().GetAsync(x => x.Id == id);
+        var entity = await UnitOfWork.Repository<Menu>().GetAsync(x => x.Id == id);
 
         if (entity == null)
             throw ValidationExceptions.RecordNotFound;
             
-        _mapper.Map(request, entity);
+        Mapper.Map(request, entity);
         
         if (request.FoodIds != null && request.FoodIds.Any())
         {
-            var foods = await _unitOfWork.Repository<Food>().GetListAsync(x => request.FoodIds.Contains(x.Id));
+            var foods = await UnitOfWork.Repository<Food>().GetListAsync(x => request.FoodIds.Contains(x.Id));
             entity.Foods = foods;
         }
 
         if (request.BeverageIds != null && request.BeverageIds.Any())
         {
-            var beverages = await _unitOfWork.Repository<Beverage>().GetListAsync(x => request.BeverageIds.Contains(x.Id));
+            var beverages = await UnitOfWork.Repository<Beverage>().GetListAsync(x => request.BeverageIds.Contains(x.Id));
             entity.Beverages = beverages;
         }
 
-        _unitOfWork.Repository<Menu>().Update(entity);
-        await _unitOfWork.SaveChangesAsync();
-        var model = _mapper.Map<MenuModel>(entity);
+        UnitOfWork.Repository<Menu>().Update(entity);
+        await UnitOfWork.SaveChangesAsync();
+        var model = Mapper.Map<MenuModel>(entity);
         return model;
     }
 }

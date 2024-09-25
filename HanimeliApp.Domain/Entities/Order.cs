@@ -1,4 +1,5 @@
 ﻿using HanimeliApp.Domain.Entities.Abstract;
+using HanimeliApp.Domain.Enums;
 
 namespace HanimeliApp.Domain.Entities;
 
@@ -7,11 +8,14 @@ public class Order : BaseEntity<int>
     public int UserId { get; set; }
     public int AddressId { get; set; }
     public decimal TotalAmount { get; set; }
-    public string Status { get; set; }
+    public OrderStatus Status { get; set; }
     public DateTime OrderDate { get; set; }
+    public DateTime? DeliveryDate { get; set; }
+    public DateTime? ActualDeliveryDate { get; set; }
+    
 
     // Navigation Properties
-    public Address DeliveryAddress { get; set; }
-    public User User { get; set; }
-    public ICollection<OrderItem> OrderItems { get; set; }
+    public virtual Address DeliveryAddress { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
+    public virtual ICollection<OrderItem> OrderItems { get; set; } = null!;
 }

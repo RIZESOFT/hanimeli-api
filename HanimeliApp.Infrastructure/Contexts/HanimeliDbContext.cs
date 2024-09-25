@@ -16,6 +16,9 @@ public class HanimeliDbContext : DbContext
     public DbSet<Rating> Ratings { get; set; }
     public DbSet<Favorite> Favorites { get; set; }
     public DbSet<Food> Foods { get; set; }
+    public DbSet<State> States { get; set; }
+    public DbSet<City> Cities { get; set; }
+    public DbSet<Country> Countries { get; set; }
     
     public HanimeliDbContext(DbContextOptions<HanimeliDbContext> options) : base(options)
     {

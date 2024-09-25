@@ -6,22 +6,34 @@ using HanimeliApp.Domain.UnitOfWorks;
 
 namespace HanimeliApp.Application.Services.Abstract
 {
-	public class ServiceBase<TEntity, TModel, TCreateRequest, TUpdateRequest>
-		where TEntity : BaseEntity<int>
+	public abstract class ServiceBase
 	{
 		protected readonly IUnitOfWork UnitOfWork;
-		private readonly IMapper _mapper;
+		protected readonly IMapper Mapper;
 
 		public ServiceBase(IUnitOfWork unitOfWork, IMapper mapper)
 		{
 			UnitOfWork = unitOfWork;
-			_mapper = mapper;
+			Mapper = mapper;
+		}
+	}
+	
+	public class ServiceBase<TEntity, TModel, TCreateRequest, TUpdateRequest>
+		where TEntity : BaseEntity<int>
+	{
+		protected readonly IUnitOfWork UnitOfWork;
+		protected readonly IMapper Mapper;
+
+		public ServiceBase(IUnitOfWork unitOfWork, IMapper mapper)
+		{
+			UnitOfWork = unitOfWork;
+			Mapper = mapper;
 		}
 		
 		public virtual async Task<TModel?> GetById(int id)
 		{
 			var entity = await UnitOfWork.Repository<TEntity>().GetAsync(x => x.Id == id);
-			var model = _mapper.Map<TModel>(entity);
+			var model = Mapper.Map<TModel>(entity);
 			return model;
 		}
 		
@@ -31,16 +43,16 @@ namespace HanimeliApp.Application.Services.Abstract
 			paging.PageNumber = pageNumber;
 			paging.ItemCount = pageSize;
 			var entities = await UnitOfWork.Repository<TEntity>().GetListAsync(x => true, x => x.OrderBy(y => y.Id), paging: paging);
-			var models = _mapper.Map<List<TModel>>(entities);
+			var models = Mapper.Map<List<TModel>>(entities);
 			return models;
 		}
 		
 		public virtual async Task<TModel> Create(TCreateRequest request)
 		{
-			var entity = _mapper.Map<TEntity>(request);
+			var entity = Mapper.Map<TEntity>(request);
 			await UnitOfWork.Repository<TEntity>().InsertAsync(entity);
 			await UnitOfWork.SaveChangesAsync();
-			var model = _mapper.Map<TModel>(entity);
+			var model = Mapper.Map<TModel>(entity);
 			return model;
 		}
 		
@@ -51,10 +63,10 @@ namespace HanimeliApp.Application.Services.Abstract
 			if (entity == null)
 				throw ValidationExceptions.RecordNotFound;
             
-			_mapper.Map(request, entity);
+			Mapper.Map(request, entity);
 			UnitOfWork.Repository<TEntity>().Update(entity);
 			await UnitOfWork.SaveChangesAsync();
-			var model = _mapper.Map<TModel>(entity);
+			var model = Mapper.Map<TModel>(entity);
 			return model;
 		}
     

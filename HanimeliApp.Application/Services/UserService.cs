@@ -18,11 +18,9 @@ namespace HanimeliApp.Application.Services
     public class UserService : ServiceBase<User, UserModel, CreateUserRequest, UpdateUserRequest>
     {
         private readonly IConfiguration _configuration;
-        private readonly IMapper _mapper;
         public UserService(IUnitOfWork unitOfWork, IConfiguration configuration, IMapper mapper) : base(unitOfWork, mapper)
         {
             _configuration = configuration;
-            _mapper = mapper;
         }
        
         public override async Task<UserModel> Create(CreateUserRequest request)
@@ -37,12 +35,12 @@ namespace HanimeliApp.Application.Services
             var dummyUser = new object();
             var hashedPassword = hasher.HashPassword(dummyUser, request.Password);
 
-            user = _mapper.Map<User>(request);
+            user = Mapper.Map<User>(request);
             user.Password = hashedPassword;
             
             await userRepository.InsertAsync(user);
             await UnitOfWork.SaveChangesAsync();
-            var userModel = _mapper.Map<UserModel>(user);
+            var userModel = Mapper.Map<UserModel>(user);
             return userModel;
         }
 
@@ -54,11 +52,11 @@ namespace HanimeliApp.Application.Services
             if (user == null)
                 throw ValidationExceptions.InvalidUser;
             
-            _mapper.Map(request, user);
+            Mapper.Map(request, user);
             
             userRepository.Update(user);
             await UnitOfWork.SaveChangesAsync();
-            var userModel = _mapper.Map<UserModel>(user);
+            var userModel = Mapper.Map<UserModel>(user);
             return userModel;
         }
 

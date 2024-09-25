@@ -11,6 +11,7 @@ public class User : BaseEntity<int>
     public string Password { get; set; }
     public string Role { get; set; }
     public int? CookId { get; set; }
+    public string? ProfilePictureUrl { get; set; }
 
     // Navigation Properties
     public ICollection<Order> Orders { get; set; }

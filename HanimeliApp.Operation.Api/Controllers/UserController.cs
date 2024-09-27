@@ -1,14 +1,14 @@
-﻿using HanimeliApp.Admin.Api.Controllers.BaseControllers;
-using HanimeliApp.Application.Models;
+﻿using HanimeliApp.Application.Models;
 using HanimeliApp.Application.Services;
 using HanimeliApp.Domain.Dtos.User;
 using HanimeliApp.Domain.Models.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HanimeliApp.Admin.Api.Controllers;
+namespace HanimeliApp.Operation.Api.Controllers;
 
-public class UserController : AdminBaseController
+[Route("api/{culture}/[controller]/[action]")]
+public class UserController : ControllerBase
 {
     private readonly UserService _userService;
 
@@ -22,13 +22,6 @@ public class UserController : AdminBaseController
     public async Task<Result<UserLoginResultModel>> Login([FromBody] UserLoginRequest request)
     {
         var result = await _userService.Login(request);
-        return Result.AsSuccess(result);
-    }
-    
-    [HttpPost]
-    public async Task<Result<UserModel>> CreateUser([FromBody] CreateUserRequest request)
-    {
-        var result = await _userService.Create(request);
         return Result.AsSuccess(result);
     }
 }

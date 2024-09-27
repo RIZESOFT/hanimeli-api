@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HanimeliApp.Admin.Api.Controllers.BaseControllers;
 using HanimeliApp.Application.Services;
 using HanimeliApp.Domain.Dtos.Food;
 using HanimeliApp.Domain.Entities;

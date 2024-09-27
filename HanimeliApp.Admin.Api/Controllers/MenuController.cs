@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HanimeliApp.Admin.Api.Controllers.BaseControllers;
 using HanimeliApp.Application.Exceptions;
 using HanimeliApp.Application.Models;
 using HanimeliApp.Application.Services;

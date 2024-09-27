@@ -3,7 +3,7 @@ using HanimeliApp.Application.Services.Abstract;
 using HanimeliApp.Domain.Entities.Abstract;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HanimeliApp.Admin.Api.Controllers;
+namespace HanimeliApp.Admin.Api.Controllers.BaseControllers;
 
 public class CrudBaseController<TService, TEntity, TModel, TCreateRequest, TUpdateRequest> : AdminBaseController
     where TService : ServiceBase<TEntity, TModel, TCreateRequest, TUpdateRequest>

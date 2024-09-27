@@ -1,0 +1,6 @@
+@HanimeliApp.Cook.Api_HostAddress = http://localhost:5239
+
+GET {{HanimeliApp.Cook.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

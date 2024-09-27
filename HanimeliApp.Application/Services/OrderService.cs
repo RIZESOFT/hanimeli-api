@@ -1,6 +1,8 @@
-﻿using AutoMapper;
+﻿using System.Linq.Expressions;
+using AutoMapper;
 using HanimeliApp.Application.Exceptions;
 using HanimeliApp.Application.Services.Abstract;
+using HanimeliApp.Application.Utilities;
 using HanimeliApp.Domain.Dtos.Order;
 using HanimeliApp.Domain.Entities;
 using HanimeliApp.Domain.Enums;
@@ -17,22 +19,31 @@ public class OrderService : ServiceBase
     {
     }
 
-    public async Task<List<OrderModel>> GetAllOrdersAsync(int pageNumber, int pageSize)
+    public async Task<List<OrderModel>> GetOrdersAsync(OrderFilterModel? filterModel, int pageNumber, int pageSize)
     {
+        Expression<Func<Order, bool>> filter = x => true;
+        if (filterModel != null)
+        {
+            if (filterModel.CookId.HasValue)
+            {
+                filter = filter.AndAlso(x => x.OrderItems.Any(y => y.CookId == filterModel.CookId));
+            }
+
+            if (filterModel.UserId.HasValue)
+            {
+                filter = filter.AndAlso(x => x.UserId == filterModel.UserId);
+            }
+            
+            if (filterModel.CourierId.HasValue)
+            {
+                filter = filter.AndAlso(x => x.CourierId == filterModel.CourierId);
+            }
+        }
+        
         var paging = new EntityPaging();
         paging.PageNumber = pageNumber;
         paging.ItemCount = pageSize;
-        var entities = await UnitOfWork.Repository<Order>().GetListAsync(x => true, x => x.OrderBy(y => y.Id), paging: paging);
-        var models = Mapper.Map<List<OrderModel>>(entities);
-        return models;
-    }
-    
-    public async Task<List<OrderModel>> GetOrdersByUserAsync(int userId, int pageNumber, int pageSize)
-    {
-        var paging = new EntityPaging();
-        paging.PageNumber = pageNumber;
-        paging.ItemCount = pageSize;
-        var entities = await UnitOfWork.Repository<Order>().GetListAsync(x => x.UserId == userId, x => x.OrderBy(y => y.Id), paging: paging);
+        var entities = await UnitOfWork.Repository<Order>().GetListAsync(filter, x => x.OrderBy(y => y.Id), paging: paging);
         var models = Mapper.Map<List<OrderModel>>(entities);
         return models;
     }

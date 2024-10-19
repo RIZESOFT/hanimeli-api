@@ -64,6 +64,10 @@ public class OrderService : ServiceBase
         if (user is null)
             throw ValidationExceptions.InvalidUser;
         
+        var address = await UnitOfWork.Repository<Address>().GetAsync(x => x.Id == request.AddressId && x.UserId == request.UserId);
+        if (address is null)
+            throw ValidationExceptions.InvalidAddress;
+        
         if (request.OrderItems.Count == 0)
             throw ValidationExceptions.OrderItemsRequired;
         
@@ -77,7 +81,7 @@ public class OrderService : ServiceBase
         var menuIds = request.OrderItems.Select(x => x.MenuId!.Value);
         var menus = await UnitOfWork.Repository<Menu>().GetListAsync(x => menuIds.Contains(x.Id));
         var order = Mapper.Map<Order>(request);
-        order.Status = OrderStatus.AssignedToCook;
+        order.Status = request.OrderItems.All(x => x.CookId.HasValue) ? OrderStatus.AssignedToCook : OrderStatus.Created; 
         order.OrderItems = request.OrderItems.Select(x => new OrderItem
         {
             MenuId = x.MenuId,

@@ -4,8 +4,10 @@ using System.Text;
 using AutoMapper;
 using HanimeliApp.Application.Exceptions;
 using HanimeliApp.Application.Services.Abstract;
+using HanimeliApp.Domain.Dtos.Address;
 using HanimeliApp.Domain.Dtos.User;
 using HanimeliApp.Domain.Entities;
+using HanimeliApp.Domain.Models.Address;
 using HanimeliApp.Domain.Models.User;
 using HanimeliApp.Domain.UnitOfWorks;
 using Microsoft.AspNetCore.Identity;
@@ -99,7 +101,7 @@ namespace HanimeliApp.Application.Services
             };
             return result;
         }
-        
+
         private string GenerateToken(List<Claim> claims)
         {
             var authSigninKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]!));

@@ -13,6 +13,6 @@ public class OrderProfile : Profile
     {
         CreateMap<Order, OrderModel>();
         CreateMap<OrderItem, OrderItemModel>();
-        CreateMap<CreateB2BOrderRequest, Order>().ForMember(x => x.OrderItems, opt => opt.Ignore());
+        CreateMap<B2BOrderRequest, Order>().ForMember(x => x.OrderItems, opt => opt.Ignore());
     }
 }

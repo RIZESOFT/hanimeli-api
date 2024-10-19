@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text;
 using HanimeliApp.Application;
 using HanimeliApp.Application.Middlewares;
+using HanimeliApp.Domain.Enums;
 using HanimeliApp.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -71,9 +72,9 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("AdminPolicy", policy =>
-        policy.RequireRole("Admin"))
+        policy.RequireRole(Roles.Admin))
     .AddPolicy("B2BPolicy", policy =>
-        policy.RequireRole("B2B", "Admin"));
+        policy.RequireRole(Roles.B2B, Roles.Admin));
 
 builder.Services.AddCors(builder => builder.AddPolicy("AllowAll",
     policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));

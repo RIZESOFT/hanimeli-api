@@ -24,6 +24,8 @@ namespace HanimeliApp.Application.Exceptions
 		public static ValidationException InvalidLanguage => new ValidationException(0010, "Geçersiz dil");
 		public static ValidationException InvalidVersion => new ValidationException(0011, "Geçersiz versiyon");
 		public static ValidationException UserAlreadyExists => new ValidationException(0012, "Böyle bir kullanıcı mevcut");
+		public static ValidationException InvalidAddress => new ValidationException(0013, "Geçersiz adres");
+
 
 
 

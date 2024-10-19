@@ -79,28 +79,34 @@ namespace HanimeliApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("CityId")
+                        .HasColumnType("integer");
 
-                    b.Property<decimal>("Latitude")
+                    b.Property<int>("CountryId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("Latitude")
                         .HasColumnType("numeric");
 
-                    b.Property<decimal>("Longitude")
+                    b.Property<decimal?>("Longitude")
                         .HasColumnType("numeric");
 
                     b.Property<string>("PostalCode")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("StateId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("CountryId");
+
+                    b.HasIndex("StateId");
 
                     b.HasIndex("UserId");
 
@@ -158,19 +164,16 @@ namespace HanimeliApp.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BeverageId")
+                    b.Property<int?>("BeverageId")
                         .HasColumnType("integer");
 
                     b.Property<int>("CartId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Count")
+                    b.Property<int?>("FoodId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("FoodId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("MenuId")
+                    b.Property<int?>("MenuId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -184,6 +187,28 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.HasIndex("MenuId");
 
                     b.ToTable("CartItems");
+                });
+
+            modelBuilder.Entity("HanimeliApp.Domain.Entities.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CountryId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
+
+                    b.ToTable("Cities");
                 });
 
             modelBuilder.Entity("HanimeliApp.Domain.Entities.Cook", b =>
@@ -208,6 +233,40 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Cooks");
+                });
+
+            modelBuilder.Entity("HanimeliApp.Domain.Entities.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Countries");
+                });
+
+            modelBuilder.Entity("HanimeliApp.Domain.Entities.Courier", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Couriers");
                 });
 
             modelBuilder.Entity("HanimeliApp.Domain.Entities.Favorite", b =>
@@ -250,6 +309,12 @@ namespace HanimeliApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -274,6 +339,12 @@ namespace HanimeliApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -294,15 +365,23 @@ namespace HanimeliApp.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("ActualDeliveryDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<int>("AddressId")
                         .HasColumnType("integer");
+
+                    b.Property<int?>("CourierId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeliveryDate")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("numeric");
@@ -313,6 +392,8 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AddressId");
+
+                    b.HasIndex("CourierId");
 
                     b.HasIndex("UserId");
 
@@ -327,7 +408,13 @@ namespace HanimeliApp.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
                     b.Property<int?>("BeverageId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("CookId")
                         .HasColumnType("integer");
 
                     b.Property<int?>("FoodId")
@@ -339,9 +426,14 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BeverageId");
+
+                    b.HasIndex("CookId");
 
                     b.HasIndex("FoodId");
 
@@ -387,6 +479,28 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.ToTable("Ratings");
                 });
 
+            modelBuilder.Entity("HanimeliApp.Domain.Entities.State", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CityId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.ToTable("States");
+                });
+
             modelBuilder.Entity("HanimeliApp.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -416,6 +530,9 @@ namespace HanimeliApp.Infrastructure.Migrations
 
                     b.Property<string>("Phone")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProfilePictureUrl")
                         .HasColumnType("text");
 
                     b.Property<string>("Role")
@@ -476,11 +593,35 @@ namespace HanimeliApp.Infrastructure.Migrations
 
             modelBuilder.Entity("HanimeliApp.Domain.Entities.Address", b =>
                 {
+                    b.HasOne("HanimeliApp.Domain.Entities.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HanimeliApp.Domain.Entities.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HanimeliApp.Domain.Entities.State", "State")
+                        .WithMany()
+                        .HasForeignKey("StateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("HanimeliApp.Domain.Entities.User", "User")
                         .WithMany("Addresses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("City");
+
+                    b.Navigation("Country");
+
+                    b.Navigation("State");
 
                     b.Navigation("User");
                 });
@@ -489,9 +630,7 @@ namespace HanimeliApp.Infrastructure.Migrations
                 {
                     b.HasOne("HanimeliApp.Domain.Entities.Beverage", "Beverage")
                         .WithMany()
-                        .HasForeignKey("BeverageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BeverageId");
 
                     b.HasOne("HanimeliApp.Domain.Entities.Cart", "Cart")
                         .WithMany("CartItems")
@@ -501,15 +640,11 @@ namespace HanimeliApp.Infrastructure.Migrations
 
                     b.HasOne("HanimeliApp.Domain.Entities.Food", "Food")
                         .WithMany()
-                        .HasForeignKey("FoodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("FoodId");
 
                     b.HasOne("HanimeliApp.Domain.Entities.Menu", "Menu")
                         .WithMany()
-                        .HasForeignKey("MenuId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MenuId");
 
                     b.Navigation("Beverage");
 
@@ -518,6 +653,17 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.Navigation("Food");
 
                     b.Navigation("Menu");
+                });
+
+            modelBuilder.Entity("HanimeliApp.Domain.Entities.City", b =>
+                {
+                    b.HasOne("HanimeliApp.Domain.Entities.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Country");
                 });
 
             modelBuilder.Entity("HanimeliApp.Domain.Entities.Favorite", b =>
@@ -555,11 +701,17 @@ namespace HanimeliApp.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("HanimeliApp.Domain.Entities.Courier", "Courier")
+                        .WithMany()
+                        .HasForeignKey("CourierId");
+
                     b.HasOne("HanimeliApp.Domain.Entities.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Courier");
 
                     b.Navigation("DeliveryAddress");
 
@@ -571,6 +723,10 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.HasOne("HanimeliApp.Domain.Entities.Beverage", "Beverage")
                         .WithMany()
                         .HasForeignKey("BeverageId");
+
+                    b.HasOne("HanimeliApp.Domain.Entities.Cook", "Cook")
+                        .WithMany()
+                        .HasForeignKey("CookId");
 
                     b.HasOne("HanimeliApp.Domain.Entities.Food", "Food")
                         .WithMany()
@@ -587,6 +743,8 @@ namespace HanimeliApp.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Beverage");
+
+                    b.Navigation("Cook");
 
                     b.Navigation("Food");
 
@@ -620,6 +778,17 @@ namespace HanimeliApp.Infrastructure.Migrations
                     b.Navigation("Menu");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HanimeliApp.Domain.Entities.State", b =>
+                {
+                    b.HasOne("HanimeliApp.Domain.Entities.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
                 });
 
             modelBuilder.Entity("HanimeliApp.Domain.Entities.User", b =>

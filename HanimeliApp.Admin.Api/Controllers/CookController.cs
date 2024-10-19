@@ -13,4 +13,4 @@ public class CookController : CrudBaseController<CookService, Cook, CookModel, C
     public CookController(CookService service) : base(service)
     {
     }
-}
+} 

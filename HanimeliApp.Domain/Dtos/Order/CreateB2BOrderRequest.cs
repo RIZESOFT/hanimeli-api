@@ -4,6 +4,11 @@ namespace HanimeliApp.Domain.Dtos.Order;
 
 public class CreateB2BOrderRequest
 {
+    public List<B2BOrderRequest> Orders { get; set; }
+}
+
+public class B2BOrderRequest
+{
     public int UserId { get; set; }
     public int AddressId { get; set; }
     public DateTime? DeliveryDate { get; set; }

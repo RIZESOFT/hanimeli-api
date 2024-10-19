@@ -24,9 +24,9 @@ public class OrderController : AdminBaseController
     }
 
     [HttpPost]
-    public async Task<Result<OrderModel>> CreateOrder([FromBody] CreateB2BOrderRequest request)
+    public async Task<Result<List<OrderModel>>> CreateOrders([FromBody] CreateB2BOrderRequest request)
     {
-        var orderModel = await _orderService.CreateB2BOrder(request);
+        var orderModel = await _orderService.CreateB2BOrders(request);
         return Result.AsSuccess(orderModel);
     }
 }

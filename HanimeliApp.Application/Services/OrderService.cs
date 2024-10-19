@@ -48,7 +48,17 @@ public class OrderService : ServiceBase
         return models;
     }
     
-    public async Task<OrderModel> CreateB2BOrder(CreateB2BOrderRequest request)
+    public async Task<List<OrderModel>> CreateB2BOrders(CreateB2BOrderRequest request)
+    {
+        var orders = new List<OrderModel>();
+        foreach (var orderRequest in request.Orders)
+        {
+            orders.Add(await CreateB2BOrder(orderRequest));
+        }
+        return orders;
+    }
+    
+    public async Task<OrderModel> CreateB2BOrder(B2BOrderRequest request)
     {
         var user = await UnitOfWork.Repository<User>().GetAsync(x => x.Id == request.UserId);
         if (user is null)
@@ -57,14 +67,14 @@ public class OrderService : ServiceBase
         if (request.OrderItems.Count == 0)
             throw ValidationExceptions.OrderItemsRequired;
         
-        if (request.OrderItems.Any(x => !x.CookId.HasValue))
-            throw ValidationExceptions.OrderItemsCookRequired;
+        //if (request.OrderItems.Any(x => !x.CookId.HasValue))
+        //    throw ValidationExceptions.OrderItemsCookRequired;
         
         if (request.OrderItems.Any(x => !x.MenuId.HasValue))
             throw ValidationExceptions.OrderItemsMenuRequired;
         
         
-        var menuIds = request.OrderItems.Select(x => x.MenuId.Value);
+        var menuIds = request.OrderItems.Select(x => x.MenuId!.Value);
         var menus = await UnitOfWork.Repository<Menu>().GetListAsync(x => menuIds.Contains(x.Id));
         var order = Mapper.Map<Order>(request);
         order.Status = OrderStatus.AssignedToCook;
@@ -72,7 +82,7 @@ public class OrderService : ServiceBase
         {
             MenuId = x.MenuId,
             CookId = x.CookId,
-            Status = OrderItemStatus.AssignedToCook,
+            Status = x.CookId.HasValue ? OrderItemStatus.AssignedToCook : OrderItemStatus.Created,
             Amount = menus.First(y => y.Id == x.MenuId).Price,
         }).ToList();
         order.TotalAmount = order.OrderItems.Sum(x => x.Amount);

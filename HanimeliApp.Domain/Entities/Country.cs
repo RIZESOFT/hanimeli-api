@@ -1,7 +1,8 @@
-﻿namespace HanimeliApp.Domain.Entities;
+﻿using HanimeliApp.Domain.Entities.Abstract;
 
-public class Country
+namespace HanimeliApp.Domain.Entities;
+
+public class Country : BaseEntity<int>
 {
     public string Name { get; set; } = null!;
-    
 }

@@ -21,5 +21,6 @@ public class B2BOrderItemRequest
     public int? FoodId { get; set; }
     public int? BeverageId { get; set; }
     public int? CookId { get; set; }
-    public decimal Amount { get; set; }
+    public decimal? Amount { get; set; }
+    public int Quantity { get; set; }
 }

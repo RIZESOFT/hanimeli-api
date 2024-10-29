@@ -13,6 +13,13 @@ public class User : BaseEntity<int>
     public int? CookId { get; set; }
     public string? ProfilePictureUrl { get; set; }
 
+    #region B2B
+    public int? DailyOrderCount { get; set; }
+    public int? AvailableWeekDays { get; set; }
+    public string? OrderHours { get; set; }
+    public string? OrderDays { get; set; }
+    #endregion
+
     // Navigation Properties
     public ICollection<Order> Orders { get; set; }
     public ICollection<Favorite> Favorites { get; set; }

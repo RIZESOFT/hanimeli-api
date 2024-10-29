@@ -7,6 +7,8 @@ using HanimeliApp.Application.Services.Abstract;
 using HanimeliApp.Domain.Dtos.Address;
 using HanimeliApp.Domain.Dtos.User;
 using HanimeliApp.Domain.Entities;
+using HanimeliApp.Domain.Enums;
+using HanimeliApp.Domain.Models;
 using HanimeliApp.Domain.Models.Address;
 using HanimeliApp.Domain.Models.User;
 using HanimeliApp.Domain.UnitOfWorks;
@@ -126,6 +128,45 @@ namespace HanimeliApp.Application.Services
             var token = tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);
+        }
+        
+        public async Task<List<UserModel>> GetB2BUserList(int pageNumber, int pageSize)
+        {
+            var paging = new EntityPaging();
+            paging.PageNumber = pageNumber;
+            paging.ItemCount = pageSize;
+            var entities = await UnitOfWork.Repository<User>().GetListAsync(x => x.Role == Roles.B2B, x => x.OrderBy(y => y.Id), paging: paging);
+            var models = Mapper.Map<List<UserModel>>(entities);
+            return models;
+        }
+        
+        public async Task<UserModel> GetB2BUserSettings(int userId)
+        {           
+            var userRepository = UnitOfWork.Repository<User>();
+            var user = await userRepository.GetAsync(x => x.Id == userId && x.Role == Roles.B2B);
+
+            if (user == null)
+                throw ValidationExceptions.InvalidUser;
+
+            var userModel = Mapper.Map<User, UserModel>(user);
+            return userModel;
+        }
+        
+        public async Task<UserModel> UpdateB2BUserSettings(UpdateB2BUserSettingsRequest request)
+        {
+            var userRepository = UnitOfWork.Repository<User>();
+
+            var user = await userRepository.GetAsync(x => x.Id == request.UserId && x.Role == Roles.B2B);
+
+            if (user == null)
+                throw ValidationExceptions.InvalidUser;
+            
+            
+            Mapper.Map(request, user);
+            userRepository.Update(user);
+            await UnitOfWork.SaveChangesAsync();
+            var userModel = Mapper.Map<UserModel>(user);
+            return userModel;
         }
     }
 }

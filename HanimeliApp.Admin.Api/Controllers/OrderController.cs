@@ -44,4 +44,18 @@ public class OrderController : AdminBaseController
         var orderModel = await _orderService.CreateB2BOrders(request);
         return Result.AsSuccess(orderModel);
     }
+    
+    [HttpGet]
+    public async Task<Result<List<AssigmentOrderModel>>> GetB2BListForAssigment([FromQuery] DateTime startDate,[FromQuery] DateTime endDate)
+    {
+        var models = await _orderService.GetB2BListForAssigment(startDate, endDate);
+        return Result.AsSuccess(models);
+    }
+    
+    [HttpPost]
+    public async Task<Result> AssignB2BOrders([FromBody] AssignB2BOrdersRequest request)
+    {
+        await _orderService.AssignB2BOrders(request);
+        return Result.AsSuccess("Ok");
+    }
 }

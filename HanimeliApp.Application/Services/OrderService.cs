@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Globalization;
+using System.Linq.Expressions;
 using AutoMapper;
 using HanimeliApp.Application.Exceptions;
 using HanimeliApp.Application.Services.Abstract;
@@ -81,14 +82,22 @@ public class OrderService : ServiceBase
         var menuIds = request.OrderItems.Select(x => x.MenuId!.Value);
         var menus = await UnitOfWork.Repository<Menu>().GetListAsync(x => menuIds.Contains(x.Id));
         var order = Mapper.Map<Order>(request);
-        order.Status = request.OrderItems.All(x => x.CookId.HasValue) ? OrderStatus.AssignedToCook : OrderStatus.Created; 
-        order.OrderItems = request.OrderItems.Select(x => new OrderItem
+        order.OrderDate = DateTime.Now;
+        order.Status = request.OrderItems.All(x => x.CookId.HasValue) ? OrderStatus.AssignedToCook : OrderStatus.Created;
+        order.OrderItems = new List<OrderItem>();
+        foreach (var orderItem in request.OrderItems)
         {
-            MenuId = x.MenuId,
-            CookId = x.CookId,
-            Status = x.CookId.HasValue ? OrderItemStatus.AssignedToCook : OrderItemStatus.Created,
-            Amount = menus.First(y => y.Id == x.MenuId).Price,
-        }).ToList();
+            for (var i = 0; i < orderItem.Quantity; i++)
+            {
+                order.OrderItems.Add(new OrderItem()
+                {
+                    MenuId = orderItem.MenuId,
+                    CookId = orderItem.CookId,
+                    Status = orderItem.CookId.HasValue ? OrderItemStatus.AssignedToCook : OrderItemStatus.Created,
+                    Amount = orderItem.Amount ?? menus.First(y => y.Id == orderItem.MenuId).Price,
+                });
+            }
+        }
         order.TotalAmount = order.OrderItems.Sum(x => x.Amount);
         await UnitOfWork.Repository<Order>().InsertAsync(order);
         await UnitOfWork.SaveChangesAsync();
@@ -110,5 +119,76 @@ public class OrderService : ServiceBase
         
         var model = Mapper.Map<OrderModel>(entity);
         return model;
+    }
+
+    public async Task<List<AssigmentOrderModel>> GetB2BListForAssigment(DateTime startDate, DateTime endDate)
+    {
+        Expression<Func<Order, bool>> filter = x => x.DeliveryDate >= startDate 
+                                                    && x.DeliveryDate <= endDate
+                                                    && x.User.Role == Roles.B2B
+                                                    && x.OrderItems.Any(y => !y.CookId.HasValue);
+        var orders = await UnitOfWork.Repository<Order>().GetListAsync(filter, x => x.OrderBy(y => y.UserId),
+            includes: x => x.Include(y => y.OrderItems));
+
+        var list = new List<AssigmentOrderModel>();
+        var groupedOrders = orders.GroupBy(x => x.DeliveryDate!.Value.Date);
+        foreach (var groupedOrder in groupedOrders)
+        {
+            var hourlyMenus = groupedOrder.GroupBy(x => $"{x.DeliveryDate!.Value.Hour}:{x.DeliveryDate.Value.Minute}").Select(x =>
+            {
+                return new
+                {
+                    Hour = x.Key,
+                    MenuIds = x.SelectMany(y => y.OrderItems.Where(z => !z.CookId.HasValue).Select(z => z.MenuId!.Value)).ToList()
+                };
+            }).ToList();
+            var item = new AssigmentOrderModel
+            {
+                DayName = groupedOrder.Key.ToString("dddd", CultureInfo.CurrentUICulture),
+                Date = groupedOrder.Key,
+                Hours = hourlyMenus.Select(x => new AssigmentOrderHourModel
+                {
+                    Hour = x.Hour,
+                    Menus = x.MenuIds.GroupBy(y => y).Select(y => new AssigmentOrderHourMenuModel()
+                    {
+                        MenuId = y.Key,
+                        Count = y.Count(),
+                    }).ToList()
+                }).ToList()
+            };
+            list.Add(item);
+        }
+        return list;
+    }
+
+    public async Task AssignB2BOrders(AssignB2BOrdersRequest request)
+    {
+        var hours = request.Hour.Split(":").Select(x => Convert.ToInt32(x)).ToList();
+        var date = request.Date.Date;
+        date = date.AddHours(hours[0]);
+        date = date.AddMinutes(hours[1]);
+        var endDate = date.AddMinutes(1);
+        Expression<Func<Order, bool>> filter = x => x.DeliveryDate >= date 
+                                                    && x.DeliveryDate <= endDate
+                                                    && x.User.Role == Roles.B2B
+                                                    && x.OrderItems.Any(y => !y.CookId.HasValue);
+        var orders = await UnitOfWork.Repository<Order>().GetListAsync(filter, x => x.OrderBy(y => y.UserId),
+            includes: x => x.Include(y => y.OrderItems));
+
+        var orderItems = orders.SelectMany(x => x.OrderItems).Where(x => !x.CookId.HasValue && x.MenuId == request.MenuId).ToList();
+        foreach (var orderItem in orderItems.Take(request.MenuCount))
+        {
+            orderItem.CookId = request.CookId;
+            orderItem.Status = OrderItemStatus.AssignedToCook;
+            UnitOfWork.Repository<OrderItem>().Update(orderItem);
+        }
+        
+        foreach (var order in orders.Where(x => x.OrderItems.All(y => y.CookId.HasValue)))
+        {
+            order.Status = OrderStatus.AssignedToCook;
+            UnitOfWork.Repository<Order>().Update(order);
+        }
+        
+        await UnitOfWork.SaveChangesAsync();
     }
 }

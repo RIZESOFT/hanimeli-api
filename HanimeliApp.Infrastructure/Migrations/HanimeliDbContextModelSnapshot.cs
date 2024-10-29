@@ -509,7 +509,13 @@ namespace HanimeliApp.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AvailableWeekDays")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("CookId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DailyOrderCount")
                         .HasColumnType("integer");
 
                     b.Property<string>("Email")
@@ -522,6 +528,12 @@ namespace HanimeliApp.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OrderDays")
+                        .HasColumnType("text");
+
+                    b.Property<string>("OrderHours")
                         .HasColumnType("text");
 
                     b.Property<string>("Password")

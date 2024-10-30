@@ -25,6 +25,16 @@ public class OrderService : ServiceBase
         Expression<Func<Order, bool>> filter = x => true;
         if (filterModel != null)
         {
+            if (filterModel.DeliveryDateStart.HasValue)
+            {
+                filter = filter.AndAlso(x => x.DeliveryDate >= filterModel.DeliveryDateStart.Value);
+            }
+            
+            if (filterModel.DeliveryDateEnd.HasValue)
+            {
+                filter = filter.AndAlso(x => x.DeliveryDate <= filterModel.DeliveryDateEnd.Value);
+            }
+
             if (filterModel.CookId.HasValue)
             {
                 filter = filter.AndAlso(x => x.OrderItems.Any(y => y.CookId == filterModel.CookId));
@@ -44,7 +54,7 @@ public class OrderService : ServiceBase
         var paging = new EntityPaging();
         paging.PageNumber = pageNumber;
         paging.ItemCount = pageSize;
-        var entities = await UnitOfWork.Repository<Order>().GetListAsync(filter, x => x.OrderBy(y => y.Id), paging: paging);
+        var entities = await UnitOfWork.Repository<Order>().GetListAsync(filter, x => x.OrderBy(y => y.Id), x => x.Include(y => y.OrderItems), paging: paging);
         var models = Mapper.Map<List<OrderModel>>(entities);
         return models;
     }

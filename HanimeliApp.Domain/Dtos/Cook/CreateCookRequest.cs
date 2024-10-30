@@ -1,10 +1,10 @@
-﻿namespace HanimeliApp.Domain.Dtos.Cook;
+﻿using HanimeliApp.Domain.Dtos.User;
 
-public class CreateCookRequest
+namespace HanimeliApp.Domain.Dtos.Cook;
+
+public class CreateCookRequest : CreateUserRequest
 {
-    
-    public string Name { get; set; }
-    public string Bio { get; set; }
-    public int UserId { get; set; }
-
+    public string Nickname { get; set; }
+    public string? Bio { get; set; }
+    public string? Iban { get; set; }
 }

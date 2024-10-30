@@ -6,4 +6,5 @@ public class CookModel
     public string Name { get; set; }
     public string Bio { get; set; }
     public decimal Rating { get; set; }
+    public string ImageUrl { get; set; }
 }

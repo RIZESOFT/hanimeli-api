@@ -25,6 +25,12 @@ public class OrderService : ServiceBase
         Expression<Func<Order, bool>> filter = x => true;
         if (filterModel != null)
         {
+            if (filterModel.CookUserId.HasValue)
+            {
+                var cookUser = await UnitOfWork.Repository<User>().GetAsync(x => x.Id == filterModel.CookUserId.Value);
+                filterModel.CookId = cookUser!.CookId;
+            }
+            
             if (filterModel.DeliveryDateStart.HasValue)
             {
                 filter = filter.AndAlso(x => x.DeliveryDate >= filterModel.DeliveryDateStart.Value);

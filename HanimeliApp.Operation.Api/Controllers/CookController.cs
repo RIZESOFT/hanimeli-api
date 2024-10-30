@@ -6,7 +6,6 @@ using HanimeliApp.Domain.Models.Cook;
 using HanimeliApp.Domain.Models.Order;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace HanimeliApp.Operation.Api.Controllers;
 
@@ -26,7 +25,7 @@ public class CookController : ControllerBase
     [HttpGet] 
     public async Task<Result<CookDashboardModel>> GetDashboard()
     {
-        var userId = Convert.ToInt32(User.FindFirstValue(JwtRegisteredClaimNames.Sub));
+        var userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
         var model = await _cookService.GetDashboard(userId);
         return Result.AsSuccess(model);
     }
@@ -34,7 +33,7 @@ public class CookController : ControllerBase
     [HttpPost] 
     public async Task<Result> UpdateOrderStatus([FromBody] UpdateOrderStatusRequest request)
     {
-        var userId = Convert.ToInt32(User.FindFirstValue(JwtRegisteredClaimNames.Sub));
+        var userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
         await _cookService.UpdateOrderStatus(userId, request);
         return Result.AsSuccess();
     }
@@ -42,8 +41,8 @@ public class CookController : ControllerBase
     [HttpGet]
     public async Task<Result<List<OrderModel>>> GetOrders([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] int pageNumber)
     {
-        var userId = Convert.ToInt32(User.FindFirstValue(JwtRegisteredClaimNames.Sub));
-        var models = await _orderService.GetOrdersAsync(new OrderFilterModel { DeliveryDateStart = startDate, DeliveryDateEnd = endDate, CookId = userId }, pageNumber, 25);
+        var userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        var models = await _orderService.GetOrdersAsync(new OrderFilterModel { DeliveryDateStart = startDate, DeliveryDateEnd = endDate, CookUserId = userId }, pageNumber, 25);
         return Result.AsSuccess(models);
     }
 }

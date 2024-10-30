@@ -7,4 +7,6 @@ public class OrderFilterModel
     public int? CourierId { get; set; }
     public DateTime? DeliveryDateStart { get; set; }
     public DateTime? DeliveryDateEnd { get; set; }
+    public int? CookUserId { get; set; }
+    public int? CourierUserId { get; set; }
 }

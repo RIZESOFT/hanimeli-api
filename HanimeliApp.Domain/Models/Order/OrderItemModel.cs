@@ -7,6 +7,7 @@ namespace HanimeliApp.Domain.Models.Order;
 
 public class OrderItemModel
 {
+    public int Id { get; set; }
     public int OrderId { get; set; }
     public int? MenuId { get; set; }
     public int? FoodId { get; set; }

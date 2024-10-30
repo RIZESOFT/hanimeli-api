@@ -10,7 +10,8 @@ public class CookProfile : Profile
     public CookProfile()
     {
         CreateMap<Cook, CookModel>().ReverseMap();
-        CreateMap<CreateCookRequest, Cook>();
+        CreateMap<CreateCookRequest, Cook>()
+            .ForMember(o => o.Name, opt => opt.MapFrom(o => o.Nickname));
         CreateMap<UpdateCookRequest, Cook>();
     }
 }

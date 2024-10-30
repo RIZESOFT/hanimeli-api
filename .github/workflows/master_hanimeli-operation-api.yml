@@ -1,12 +1,12 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Mobile Publish Workflow
+name: Build and deploy ASP.Net Core app to Azure Web App - hanimeli-operation-api
 
 on:
   push:
-    tags:
-      - 'operation-v*' 
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:
@@ -22,16 +22,16 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build ./HanimeliApp.Operation.Api/HanimeliApp.Operation.Api.csproj --configuration Release
+        run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish ./HanimeliApp.Operation.Api/HanimeliApp.Operation.Api.csproj -c Release -o ${{env.DOTNET_ROOT}}/operationapp
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: operation-app
-          path: ${{env.DOTNET_ROOT}}/operationapp
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
     runs-on: ubuntu-latest
@@ -39,13 +39,22 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
+    permissions:
+      id-token: write #This is required for requesting the JWT
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: operation-app
+          name: .net-app
       
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_ED116F6EE4054479BFD26ECE9F7328A2 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_29B41DAE1DEB436EAA9ADF289E604AAC }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C6BBA9A5FEB04B2D83818B5E0CBFAE3B }}
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
@@ -53,4 +62,4 @@ jobs:
           app-name: 'hanimeli-operation-api'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E141E41E993E4D5FBC872CBF0E0C8661 }}
+          

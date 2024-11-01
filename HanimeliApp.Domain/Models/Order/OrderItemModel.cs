@@ -14,9 +14,17 @@ public class OrderItemModel
     public int? BeverageId { get; set; }
     public int? CookId { get; set; }
     public decimal Amount { get; set; }
-    
-    public MenuModel Menu { get; set; }
-    public FoodModel Food { get; set; }
-    public BeverageModel Beverage { get; set; }
-    public CookModel Cook { get; set; }
+    public int Quantity { get; set; }
+    public decimal TotalAmount 
+    { 
+        get
+        {
+            return Amount * Quantity;
+        }
+    }
+
+    public MenuModel? Menu { get; set; }
+    public FoodModel? Food { get; set; }
+    public BeverageModel? Beverage { get; set; }
+    public CookModel? Cook { get; set; }
 }

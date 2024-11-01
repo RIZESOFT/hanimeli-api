@@ -24,13 +24,16 @@ public class OrderController : BaseController
         var isAdmin = User.IsInRole("Admin");
         var filterModel = new OrderFilterModel
         {
-            
+            OrderDateStart = request.OrderDateStart,
+            OrderDateEnd = request.OrderDateEnd,
+            DeliveryDateStart = request.DeliveryDateStart,
+            DeliveryDateEnd = request.DeliveryDateEnd,
         };
         if (!isAdmin)
         {
             filterModel.UserId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
         }
-        var models = await _orderService.GetOrdersAsync(null, request.PageNumber, 25);
+        var models = await _orderService.GetOrdersAsync(filterModel, request.PageNumber, 25);
         return Result.AsSuccess(models);
     }
 

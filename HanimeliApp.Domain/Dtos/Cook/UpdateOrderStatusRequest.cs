@@ -3,5 +3,5 @@
 public class UpdateOrderStatusRequest
 {
     public int OrderId { get; set; }
-    public List<int> OrderItemIds { get; set; }
+    //public List<int> OrderItemIds { get; set; }
 }

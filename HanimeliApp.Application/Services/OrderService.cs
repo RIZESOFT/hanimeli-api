@@ -30,7 +30,17 @@ public class OrderService : ServiceBase
                 var cookUser = await UnitOfWork.Repository<User>().GetAsync(x => x.Id == filterModel.CookUserId.Value);
                 filterModel.CookId = cookUser!.CookId;
             }
-            
+
+            if (filterModel.OrderDateStart.HasValue)
+            {
+                filter = filter.AndAlso(x => x.OrderDate >= filterModel.OrderDateStart.Value);
+            }
+
+            if (filterModel.OrderDateEnd.HasValue)
+            {
+                filter = filter.AndAlso(x => x.OrderDate <= filterModel.OrderDateEnd.Value);
+            }
+
             if (filterModel.DeliveryDateStart.HasValue)
             {
                 filter = filter.AndAlso(x => x.DeliveryDate >= filterModel.DeliveryDateStart.Value);
@@ -60,7 +70,11 @@ public class OrderService : ServiceBase
         var paging = new EntityPaging();
         paging.PageNumber = pageNumber;
         paging.ItemCount = pageSize;
-        var entities = await UnitOfWork.Repository<Order>().GetListAsync(filter, x => x.OrderBy(y => y.Id), x => x.Include(y => y.OrderItems), paging: paging);
+        var entities = await UnitOfWork.Repository<Order>().GetListAsync(filter, 
+            x => x.OrderBy(y => y.Id), 
+            x => x.Include(y => y.OrderItems).ThenInclude(y => y.Menu).ThenInclude(y => y.Foods)
+                .Include(y => y.OrderItems).ThenInclude(y => y.Menu).ThenInclude(y => y.Beverages), 
+            paging: paging);
         var models = Mapper.Map<List<OrderModel>>(entities);
         return models;
     }

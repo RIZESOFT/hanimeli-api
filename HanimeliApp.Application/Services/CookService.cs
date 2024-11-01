@@ -5,6 +5,7 @@ using HanimeliApp.Domain.Dtos.Beverage;
 using HanimeliApp.Domain.Dtos.Cook;
 using HanimeliApp.Domain.Dtos.Food;
 using HanimeliApp.Domain.Entities;
+using HanimeliApp.Domain.Entities.Abstract;
 using HanimeliApp.Domain.Enums;
 using HanimeliApp.Domain.Models.Beverage;
 using HanimeliApp.Domain.Models.Cook;
@@ -40,10 +41,9 @@ public class CookService : ServiceBase<Cook, CookModel, CreateCookRequest, Updat
         user = Mapper.Map<User>(request);
         user.Password = hashedPassword;
         user.Cook = Mapper.Map<Cook>(request);
-
+        user.Role = Roles.Cook;
             
         await userRepository.InsertAsync(user);
-        await UnitOfWork.SaveChangesAsync();
         await UnitOfWork.SaveChangesAsync();
         var model = Mapper.Map<CookModel>(user.Cook);
         return model;
@@ -65,10 +65,10 @@ public class CookService : ServiceBase<Cook, CookModel, CreateCookRequest, Updat
         user = Mapper.Map<User>(request);
         user.Password = hashedPassword;
         user.Cook = Mapper.Map<Cook>(request);
-
+        user.Cook.ImageUrl = imageUrl;
+        user.Role = Roles.Cook;
 
         await userRepository.InsertAsync(user);
-        await UnitOfWork.SaveChangesAsync();
         await UnitOfWork.SaveChangesAsync();
         var model = Mapper.Map<CookModel>(user.Cook);
         return model;
@@ -136,19 +136,25 @@ public class CookService : ServiceBase<Cook, CookModel, CreateCookRequest, Updat
         if (order.Status == OrderStatus.DeliveredToCourier)
             throw new Exception($"Order with id: {request.OrderId} already delivered to courier");
 
-        var orderItems = order.OrderItems.Where(x => request.OrderItemIds.Contains(x.Id)).ToList();
-        if (orderItems.Any(x => x.Status == OrderItemStatus.Completed))
-            throw new Exception($"Order with id: {request.OrderId} already delivered to courier");
+        //var orderItems = order.OrderItems.Where(x => request.OrderItemIds.Contains(x.Id)).ToList();
+        //if (orderItems.Any(x => x.Status == OrderItemStatus.Completed))
+        //    throw new Exception($"Order with id: {request.OrderId} already delivered to courier");
 
-        if (orderItems.Any(x => x.CookId != user.CookId))
-            throw new Exception($"Order with id: {request.OrderId} does not belong to user");
+        //if (orderItems.Any(x => x.CookId != user.CookId))
+        //    throw new Exception($"Order with id: {request.OrderId} does not belong to user");
             
-        foreach (var orderItem in orderItems)
+        //foreach (var orderItem in orderItems)
+        //{
+        //    orderItem.Status = OrderItemStatus.Completed;
+        //    UnitOfWork.Repository<OrderItem>().Update(orderItem);
+        //}
+
+        foreach (var orderItem in order.OrderItems.Where(x => x.CookId == user.CookId))
         {
             orderItem.Status = OrderItemStatus.Completed;
             UnitOfWork.Repository<OrderItem>().Update(orderItem);
         }
-        
+
         if (order.OrderItems.All(x => x.Status == OrderItemStatus.Completed))
         {
             order.Status = OrderStatus.AssignedToCook;

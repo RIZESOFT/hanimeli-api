@@ -28,6 +28,10 @@ namespace HanimeliApp.Application.Models
             Category = category;
             Code = code;
             DisplayMessage = Localizer.Instance.Translate($"EXC_{this.GetType().Name}_{code.ToString().PadLeft(4, '0')}") ?? Localizer.Instance.Translate($"EXC_{this.GetType().Name}");
+            if (DisplayMessage == $"EXC_{this.GetType().Name}_{code.ToString().PadLeft(4, '0')}" || DisplayMessage == $"EXC_{this.GetType().Name}")
+            {
+                DisplayMessage = exceptionMessage;
+            }
         }
 
 

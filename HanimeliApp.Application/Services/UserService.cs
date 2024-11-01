@@ -109,16 +109,12 @@ namespace HanimeliApp.Application.Services
             var resultModel = await Login(request);
             var user = await UnitOfWork.Repository<User>().GetAsync(x => x.Id == resultModel.Id);
             var operationResultModel = new OperationUserLoginResultModel(resultModel);
-            var address = await UnitOfWork.Repository<Address>().GetAsync(x => x.UserId == user.Id);
-            if (address != null)
-            {
-                operationResultModel.AddressId = address.Id;
-            }
             if (user!.Role == Roles.Cook)
             {
                 var cook = await UnitOfWork.Repository<Cook>().GetAsync(x => x.Id == user.CookId);
                 operationResultModel.Iban = cook.Iban;
                 operationResultModel.Nickname = cook.Name;
+                operationResultModel.Address = cook.Address;
             }
             return operationResultModel;
         }

@@ -10,7 +10,7 @@ public class OperationUserLoginResultModel : UserLoginResultModel
     {
     }
 
-    public int AddressId { get; set; }
-    public string Iban { get; set; }
-    public string Nickname { get; set; }
+    public string? Iban { get; set; }
+    public string? Nickname { get; set; }
+    public string? Address { get; set; }
 }

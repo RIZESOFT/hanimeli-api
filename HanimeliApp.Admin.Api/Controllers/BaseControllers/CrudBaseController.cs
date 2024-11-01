@@ -1,11 +1,12 @@
 ﻿using HanimeliApp.Application.Models;
 using HanimeliApp.Application.Services.Abstract;
 using HanimeliApp.Domain.Entities.Abstract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HanimeliApp.Admin.Api.Controllers.BaseControllers;
 
-public class CrudBaseController<TService, TEntity, TModel, TCreateRequest, TUpdateRequest> : AdminBaseController
+public class CrudBaseController<TService, TEntity, TModel, TCreateRequest, TUpdateRequest> : BaseController
     where TService : ServiceBase<TEntity, TModel, TCreateRequest, TUpdateRequest>
     where TEntity : BaseEntity<int>
 {
@@ -16,6 +17,7 @@ public class CrudBaseController<TService, TEntity, TModel, TCreateRequest, TUpda
         Service = service;
     }
 
+    [Authorize(Policy = "AdminPolicy")]
     [HttpGet("{id}")]
     public async Task<Result<TModel>> GetById(int id)
     {
@@ -23,6 +25,7 @@ public class CrudBaseController<TService, TEntity, TModel, TCreateRequest, TUpda
         return Result.AsSuccess(model);
     }
 
+    [Authorize(Policy = "AdminPolicy")]
     [HttpGet]
     public async Task<Result<List<TModel>>> GetList([FromQuery] int pageNumber)
     {
@@ -30,6 +33,7 @@ public class CrudBaseController<TService, TEntity, TModel, TCreateRequest, TUpda
         return Result.AsSuccess(models);
     }
 
+    [Authorize(Policy = "AdminPolicy")]
     [HttpPost]
     public virtual async Task<Result<TModel>> Create([FromBody] TCreateRequest request)
     {
@@ -37,6 +41,7 @@ public class CrudBaseController<TService, TEntity, TModel, TCreateRequest, TUpda
         return Result.AsSuccess(model);
     }
 
+    [Authorize(Policy = "AdminPolicy")]
     [HttpPut("{id:int}")]
     public virtual async Task<Result<TModel>> Update(int id, [FromBody] TUpdateRequest request)
     {
@@ -44,6 +49,7 @@ public class CrudBaseController<TService, TEntity, TModel, TCreateRequest, TUpda
         return Result.AsSuccess(model);
     }
 
+    [Authorize(Policy = "AdminPolicy")]
     [HttpDelete("{id:int}")]
     public async Task<Result> Delete(int id)
     {

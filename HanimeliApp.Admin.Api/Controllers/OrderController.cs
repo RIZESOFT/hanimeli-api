@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HanimeliApp.Admin.Api.Controllers;
 
-public class OrderController : AdminBaseController
+public class OrderController : BaseController
 {
     private readonly OrderService _orderService;
 
@@ -19,21 +19,22 @@ public class OrderController : AdminBaseController
     }
 
     [HttpGet]
-    [Authorize(Policy = "B2BPolicy")]
-    public async Task<Result<List<OrderModel>>> GetList([FromQuery] int pageNumber)
+    public async Task<Result<List<OrderModel>>> GetList([FromQuery] GetOrderListRequest request)
     {
         var isAdmin = User.IsInRole("Admin");
-        var filterModel = new OrderFilterModel();
+        var filterModel = new OrderFilterModel
+        {
+            
+        };
         if (!isAdmin)
         {
             filterModel.UserId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
         }
-        var models = await _orderService.GetOrdersAsync(null, pageNumber, 25);
+        var models = await _orderService.GetOrdersAsync(null, request.PageNumber, 25);
         return Result.AsSuccess(models);
     }
 
     [HttpPost]
-    [Authorize(Policy = "B2BPolicy")]
     public async Task<Result<List<OrderModel>>> CreateOrders([FromBody] CreateB2BOrderRequest request)
     {
         var isAdmin = User.IsInRole("Admin");
@@ -45,13 +46,15 @@ public class OrderController : AdminBaseController
         return Result.AsSuccess(orderModel);
     }
     
+    [Authorize(Policy = "AdminPolicy")]
     [HttpGet]
     public async Task<Result<List<AssigmentOrderModel>>> GetB2BListForAssigment([FromQuery] DateTime startDate,[FromQuery] DateTime endDate)
     {
         var models = await _orderService.GetB2BListForAssigment(startDate, endDate);
         return Result.AsSuccess(models);
     }
-    
+
+    [Authorize(Policy = "AdminPolicy")]
     [HttpPost]
     public async Task<Result> AssignB2BOrders([FromBody] AssignB2BOrdersRequest request)
     {

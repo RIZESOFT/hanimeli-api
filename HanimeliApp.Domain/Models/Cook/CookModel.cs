@@ -8,4 +8,5 @@ public class CookModel
     public decimal Rating { get; set; }
     public string Iban { get; set; }
     public string ImageUrl { get; set; }
+    public string Address { get; set; }
 }

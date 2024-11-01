@@ -12,6 +12,7 @@ public class MenuProfile : Profile
     {
         CreateMap<Menu, MenuModel>().ReverseMap();
         CreateMap<CreateMenuRequest, Menu>();
-        CreateMap<UpdateMenuRequest, Menu>();
+        CreateMap<UpdateMenuRequest, Menu>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
     }
 }

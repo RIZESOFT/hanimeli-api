@@ -11,6 +11,7 @@ public class FoodProfile : Profile
     {
         CreateMap<Food, FoodModel>().ReverseMap();
         CreateMap<CreateFoodRequest, Food>();
-        CreateMap<UpdateFoodRequest, Food>();
+        CreateMap<UpdateFoodRequest, Food>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null)); ;
     }
 }

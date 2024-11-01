@@ -97,13 +97,32 @@ namespace HanimeliApp.Application.Services
 
             var token = GenerateToken(claims);
 
-            var result = new UserLoginResultModel(user.Name, user.LastName, user.Email, user.Role, token)
+            var result = new UserLoginResultModel(user.Id, user.Name, user.LastName, user.Email, user.Role, token)
             {
                 PhoneNumber = user.Phone
             };
             return result;
         }
 
+        public async Task<OperationUserLoginResultModel> OperationLogin(UserLoginRequest request)
+        {
+            var resultModel = await Login(request);
+            var user = await UnitOfWork.Repository<User>().GetAsync(x => x.Id == resultModel.Id);
+            var operationResultModel = new OperationUserLoginResultModel(resultModel);
+            var address = await UnitOfWork.Repository<Address>().GetAsync(x => x.UserId == user.Id);
+            if (address != null)
+            {
+                operationResultModel.AddressId = address.Id;
+            }
+            if (user!.Role == Roles.Cook)
+            {
+                var cook = await UnitOfWork.Repository<Cook>().GetAsync(x => x.Id == user.CookId);
+                operationResultModel.Iban = cook.Iban;
+                operationResultModel.Nickname = cook.Name;
+            }
+            return operationResultModel;
+        }
+        
         private string GenerateToken(List<Claim> claims)
         {
             var authSigninKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]!));

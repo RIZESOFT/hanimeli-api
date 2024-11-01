@@ -3,12 +3,15 @@ using HanimeliApp.Application.Exceptions;
 using HanimeliApp.Application.Services.Abstract;
 using HanimeliApp.Domain.Dtos.Beverage;
 using HanimeliApp.Domain.Dtos.Cook;
+using HanimeliApp.Domain.Dtos.Food;
 using HanimeliApp.Domain.Entities;
 using HanimeliApp.Domain.Enums;
 using HanimeliApp.Domain.Models.Beverage;
 using HanimeliApp.Domain.Models.Cook;
+using HanimeliApp.Domain.Models.Food;
 using HanimeliApp.Domain.Models.Order;
 using HanimeliApp.Domain.UnitOfWorks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,8 +19,10 @@ namespace HanimeliApp.Application.Services;
 
 public class CookService : ServiceBase<Cook, CookModel, CreateCookRequest, UpdateCookRequest>
 {
-    public CookService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+    private readonly ImageService _imageService;
+    public CookService(IUnitOfWork unitOfWork, IMapper mapper, ImageService imageService) : base(unitOfWork, mapper)
     {
+        _imageService = imageService;
     }
 
     public override async Task<CookModel> Create(CreateCookRequest request)
@@ -44,6 +49,51 @@ public class CookService : ServiceBase<Cook, CookModel, CreateCookRequest, Updat
         return model;
     }
 
+    public async Task<CookModel> CreateWithImage(CreateCookRequest request, IFormFile imageFile)
+    {
+        var imageUrl = await _imageService.UploadImageAsync(imageFile, "images");
+        var userRepository = UnitOfWork.Repository<User>();
+        var user = await userRepository.GetAsync(x => x.Email == request.Email || x.Phone == request.Phone);
+
+        if (user != null)
+            throw ValidationExceptions.UserAlreadyExists;
+
+        var hasher = new PasswordHasher<object>();
+        var dummyUser = new object();
+        var hashedPassword = hasher.HashPassword(dummyUser, request.Password);
+
+        user = Mapper.Map<User>(request);
+        user.Password = hashedPassword;
+        user.Cook = Mapper.Map<Cook>(request);
+
+
+        await userRepository.InsertAsync(user);
+        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync();
+        var model = Mapper.Map<CookModel>(user.Cook);
+        return model;
+    }
+
+    public async Task<CookModel> UpdateWithImage(int id, UpdateCookRequest request, IFormFile imageFile)
+    {
+        var entity = await UnitOfWork.Repository<Cook>().GetAsync(x => x.Id == id);
+
+        if (entity == null)
+            throw ValidationExceptions.RecordNotFound;
+
+        Mapper.Map(request, entity);
+
+        if (imageFile != null)
+        {
+            var imageUrl = await _imageService.UploadImageAsync(imageFile, "images");
+            entity.ImageUrl = imageUrl;
+        }
+        
+        UnitOfWork.Repository<Cook>().Update(entity);
+        await UnitOfWork.SaveChangesAsync();
+        var model = Mapper.Map<CookModel>(entity);
+        return model;
+    }
     public async Task<CookDashboardModel> GetDashboard(int userId)
     {
         const int profitPerMenu = 30;

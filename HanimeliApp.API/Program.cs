@@ -46,7 +46,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddInfrastructure(configuration.GetConnectionString("Default")!);
-builder.Services.AddApplication();
+builder.Services.AddApplication(configuration);
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

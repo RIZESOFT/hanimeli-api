@@ -39,10 +39,15 @@ public class AzureStorageHelper
         return await blobClient.OpenReadAsync();
     }
     
-    public async Task UploadFileAsync(string containerName, string fileName, Stream fileStream)
+    public async Task UploadFileAsync(string containerName, string fileName, Stream fileStream, string contentType)
     {
         var blobClient = await GetBlobAsync(containerName, fileName.ToLower());
-        await blobClient.UploadAsync(fileStream, overwrite: true);
+        var blobHttpHeaders = new BlobHttpHeaders { ContentType = contentType };
+        var uploadOptions = new BlobUploadOptions
+        {
+            HttpHeaders = blobHttpHeaders
+        };
+        await blobClient.UploadAsync(fileStream, uploadOptions);
     }
     
     public async Task DeleteFileAsync(string storageContainer, string fileName)

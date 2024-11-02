@@ -27,9 +27,11 @@ namespace HanimeliApp.Application.Services
 
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
             await using var stream = imageFile.OpenReadStream();
-            await _azureStorageHelper.UploadFileAsync(containerName, fileName, stream);
+            var contentType = imageFile.ContentType;
+            await _azureStorageHelper.UploadFileAsync(containerName, fileName, stream, contentType);
 
             return await _azureStorageHelper.GetFilePathAsync(containerName, fileName);
         }
+
     }
 }

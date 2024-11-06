@@ -3,6 +3,7 @@ using HanimeliApp.Application.Exceptions;
 using HanimeliApp.Domain.Entities.Abstract;
 using HanimeliApp.Domain.Models;
 using HanimeliApp.Domain.UnitOfWorks;
+using System.Linq.Expressions;
 
 namespace HanimeliApp.Application.Services.Abstract
 {
@@ -24,7 +25,10 @@ namespace HanimeliApp.Application.Services.Abstract
 		protected readonly IUnitOfWork UnitOfWork;
 		protected readonly IMapper Mapper;
 
-		public ServiceBase(IUnitOfWork unitOfWork, IMapper mapper)
+		public Func<IQueryable<TEntity>, IQueryable<TEntity>>? GetByIdIncludes = null;
+		public Func<IQueryable<TEntity>, IQueryable<TEntity>>? GetListIncludes = null;
+
+        public ServiceBase(IUnitOfWork unitOfWork, IMapper mapper)
 		{
 			UnitOfWork = unitOfWork;
 			Mapper = mapper;
@@ -32,17 +36,17 @@ namespace HanimeliApp.Application.Services.Abstract
 		
 		public virtual async Task<TModel?> GetById(int id)
 		{
-			var entity = await UnitOfWork.Repository<TEntity>().GetAsync(x => x.Id == id);
+			var entity = await UnitOfWork.Repository<TEntity>().GetAsync(x => x.Id == id, includes: GetByIdIncludes);
 			var model = Mapper.Map<TModel>(entity);
 			return model;
 		}
 		
-		public virtual async Task<List<TModel>> GetList(int pageNumber, int pageSize)
+		public virtual async Task<List<TModel>> GetList(Expression<Func<TEntity, bool>> filter, int pageNumber, int pageSize)
 		{
 			var paging = new EntityPaging();
 			paging.PageNumber = pageNumber;
 			paging.ItemCount = pageSize;
-			var entities = await UnitOfWork.Repository<TEntity>().GetListAsync(x => true, x => x.OrderBy(y => y.Id), paging: paging);
+			var entities = await UnitOfWork.Repository<TEntity>().GetListAsync(filter, x => x.OrderBy(y => y.Id), paging: paging, includes: GetListIncludes);
 			var models = Mapper.Map<List<TModel>>(entities);
 			return models;
 		}

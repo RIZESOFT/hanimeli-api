@@ -9,6 +9,7 @@ using HanimeliApp.Domain.Models.Food;
 using HanimeliApp.Domain.Models.Menu;
 using HanimeliApp.Domain.UnitOfWorks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace HanimeliApp.Application.Services;
 
@@ -19,6 +20,9 @@ public class MenuService : ServiceBase<Menu, MenuModel, CreateMenuRequest, Updat
     public MenuService(IUnitOfWork unitOfWork, IMapper mapper, ImageService imageService) : base(unitOfWork, mapper)
     {
         _imageService = imageService;
+
+        GetByIdIncludes = x => x.Include(y => y.Foods).Include(y => y.Beverages);
+        GetListIncludes = x => x.Include(y => y.Foods).Include(y => y.Beverages);
     }
 
     public override async Task<MenuModel> Create(CreateMenuRequest request)

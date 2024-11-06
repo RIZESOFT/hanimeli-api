@@ -29,7 +29,7 @@ public class CrudBaseController<TService, TEntity, TModel, TCreateRequest, TUpda
     [HttpGet]
     public async Task<Result<List<TModel>>> GetList([FromQuery] int pageNumber)
     {
-        var models = await Service.GetList(pageNumber, 25);
+        var models = await Service.GetList(x => true, pageNumber, 25);
         return Result.AsSuccess(models);
     }
 

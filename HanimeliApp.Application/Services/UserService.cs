@@ -107,7 +107,11 @@ namespace HanimeliApp.Application.Services
         public async Task<OperationUserLoginResultModel> OperationLogin(UserLoginRequest request)
         {
             var resultModel = await Login(request);
-            var user = await UnitOfWork.Repository<User>().GetAsync(x => x.Id == resultModel.Id);
+            var user = await UnitOfWork.Repository<User>().GetAsync(x => x.Id == resultModel.Id && (x.Role == Roles.Cook || x.Role == Roles.Courier));
+
+            if (user == null)
+                throw AuthenticationExceptions.UserInvalidException;
+
             var operationResultModel = new OperationUserLoginResultModel(resultModel);
             if (user!.Role == Roles.Cook)
             {

@@ -28,7 +28,7 @@ public class AddressController : CrudBaseController<AddressService, Address, Add
         return base.Create(request);
     }
 
-    [HttpPost]
+    [HttpPut("{id:int}")]
     public override Task<Result<AddressModel>> Update(int id, [FromBody] UpdateAddressRequest request)
     {
         var isAdmin = User.IsInRole("Admin");

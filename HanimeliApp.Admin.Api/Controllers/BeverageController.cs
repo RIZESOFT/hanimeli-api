@@ -6,6 +6,7 @@ using HanimeliApp.Domain.Dtos.Beverage;
 using HanimeliApp.Domain.Entities;
 using HanimeliApp.Domain.Models.Beverage;
 using HanimeliApp.Domain.UnitOfWorks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HanimeliApp.Admin.Api.Controllers;
@@ -16,6 +17,7 @@ public class BeverageController : CrudBaseController<BeverageService, Beverage, 
     {
     }
 
+    [Authorize(Policy = "AdminPolicy")]
     [HttpPost]
     public async Task<Result<BeverageModel>> CreateWithImage([FromForm] CreateBeverageRequest request, IFormFile imageFile)
     {
@@ -23,6 +25,7 @@ public class BeverageController : CrudBaseController<BeverageService, Beverage, 
         return Result.AsSuccess(model);
     }
 
+    [Authorize(Policy = "AdminPolicy")]
     [HttpPut("{id:int}")]
     public async Task<Result<BeverageModel>> UpdateWithImage(int id, [FromForm] UpdateBeverageRequest request, IFormFile imageFile)
     {

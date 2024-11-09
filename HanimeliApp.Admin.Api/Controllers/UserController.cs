@@ -25,8 +25,15 @@ public class UserController : CrudBaseController<UserService, User, UserModel, C
         return Result.AsSuccess(result);
     }
 
+    [Authorize(Policy = "AdminPolicy")]
     [HttpGet]
-    [Authorize(Policy = "B2BPolicy")]
+    public async Task<Result<List<UserModel>>> GetB2BUserList([FromQuery] int pageNumber)
+    {
+        var result = await Service.GetB2BUserList(pageNumber, 25);
+        return Result.AsSuccess(result);
+    }
+
+    [HttpGet]
     public async Task<Result<UserModel>> GetB2BUserSettings([FromQuery] int userId)
     {
         if (User.IsInRole(Roles.B2B))
@@ -38,7 +45,6 @@ public class UserController : CrudBaseController<UserService, User, UserModel, C
     }
     
     [HttpPost]
-    [Authorize(Policy = "B2BPolicy")]
     public async Task<Result<UserModel>> UpdateB2BUserSettings([FromBody] UpdateB2BUserSettingsRequest request)
     {
         if (User.IsInRole(Roles.B2B))

@@ -221,4 +221,18 @@ public class OrderService : ServiceBase
         
         await UnitOfWork.SaveChangesAsync();
     }
+
+    public async Task UnassignB2BOrders(int cookId)
+    {
+        Expression<Func<Order, bool>> filter = x => x.Status != OrderStatus.Completed && x.Status != OrderStatus.DeliveredToCourier && x.OrderItems.Any(y => y.CookId == cookId && y.Status != OrderItemStatus.Completed);
+        var orders = await UnitOfWork.Repository<Order>().GetListAsync(filter, x => x.OrderBy(y => y.UserId),
+            includes: x => x.Include(y => y.OrderItems));
+        foreach (var orderItem in orders.SelectMany(order => order.OrderItems.Where(x => x.CookId == cookId && x.Status != OrderItemStatus.Completed)))
+        {
+            orderItem.CookId = null;
+            orderItem.Status = OrderItemStatus.Created;
+            UnitOfWork.Repository<OrderItem>().Update(orderItem);
+        }
+        await UnitOfWork.SaveChangesAsync();
+    }
 }

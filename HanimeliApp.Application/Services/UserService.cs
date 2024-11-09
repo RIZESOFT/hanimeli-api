@@ -1,9 +1,11 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using HanimeliApp.Application.Exceptions;
 using HanimeliApp.Application.Services.Abstract;
+using HanimeliApp.Application.Utilities;
 using HanimeliApp.Domain.Dtos.Address;
 using HanimeliApp.Domain.Dtos.User;
 using HanimeliApp.Domain.Entities;
@@ -22,11 +24,35 @@ namespace HanimeliApp.Application.Services
     public class UserService : ServiceBase<User, UserModel, CreateUserRequest, UpdateUserRequest>
     {
         private readonly IConfiguration _configuration;
-        public UserService(IUnitOfWork unitOfWork, IConfiguration configuration, IMapper mapper) : base(unitOfWork, mapper)
+
+        public UserService(IUnitOfWork unitOfWork, IConfiguration configuration, IMapper mapper) : base(unitOfWork,
+            mapper)
         {
             _configuration = configuration;
         }
-       
+
+
+        public async Task<List<UserModel>> GetListWithFilter(UserFilterModel? filterModel, int pageNumber, int pageSize)
+        {
+            Expression<Func<User, bool>> filter = x => true;
+            if (filterModel != null)
+            {
+                if (filterModel.IsB2b.HasValue)
+                {
+                    filter = filter.AndAlso(x => x.Role == Roles.B2B);
+                }
+            }
+
+            var paging = new EntityPaging();
+            paging.PageNumber = pageNumber;
+            paging.ItemCount = pageSize;
+            var entities = await UnitOfWork.Repository<User>().GetListAsync(filter,
+                x => x.OrderBy(y => y.Id),
+                paging: paging);
+            var models = Mapper.Map<List<UserModel>>(entities);
+            return models;
+        }
+
         public override async Task<UserModel> Create(CreateUserRequest request)
         {
             var userRepository = UnitOfWork.Repository<User>();
@@ -34,14 +60,14 @@ namespace HanimeliApp.Application.Services
 
             if (user != null)
                 throw ValidationExceptions.UserAlreadyExists;
-            
+
             var hasher = new PasswordHasher<object>();
             var dummyUser = new object();
             var hashedPassword = hasher.HashPassword(dummyUser, request.Password);
 
             user = Mapper.Map<User>(request);
             user.Password = hashedPassword;
-            
+
             await userRepository.InsertAsync(user);
             await UnitOfWork.SaveChangesAsync();
             var userModel = Mapper.Map<UserModel>(user);
@@ -55,9 +81,9 @@ namespace HanimeliApp.Application.Services
 
             if (user == null)
                 throw ValidationExceptions.InvalidUser;
-            
+
             Mapper.Map(request, user);
-            
+
             userRepository.Update(user);
             await UnitOfWork.SaveChangesAsync();
             var userModel = Mapper.Map<UserModel>(user);
@@ -66,11 +92,12 @@ namespace HanimeliApp.Application.Services
 
         public async Task<UserLoginResultModel> Login(UserLoginRequest request)
         {
-            var user = await UnitOfWork.Repository<User>().GetAsync(x => (x.Email == request.Username || x.Phone == request.Username));
+            var user = await UnitOfWork.Repository<User>()
+                .GetAsync(x => (x.Email == request.Username || x.Phone == request.Username));
 
             if (user == null)
                 throw AuthenticationExceptions.UserInvalidException;
-            
+
             var hasher = new PasswordHasher<object>();
             var dummyUser = new object();
             var verificationResult = hasher.VerifyHashedPassword(dummyUser, user.Password, request.Password);
@@ -78,9 +105,9 @@ namespace HanimeliApp.Application.Services
             switch (verificationResult)
             {
                 case PasswordVerificationResult.Success:
-                case PasswordVerificationResult.SuccessRehashNeeded: 
+                case PasswordVerificationResult.SuccessRehashNeeded:
                     break;
-                
+
                 case PasswordVerificationResult.Failed:
                     throw AuthenticationExceptions.UserInvalidException;
             }
@@ -107,7 +134,8 @@ namespace HanimeliApp.Application.Services
         public async Task<OperationUserLoginResultModel> OperationLogin(UserLoginRequest request)
         {
             var resultModel = await Login(request);
-            var user = await UnitOfWork.Repository<User>().GetAsync(x => x.Id == resultModel.Id && (x.Role == Roles.Cook || x.Role == Roles.Courier));
+            var user = await UnitOfWork.Repository<User>().GetAsync(x =>
+                x.Id == resultModel.Id && (x.Role == Roles.Cook || x.Role == Roles.Courier));
 
             if (user == null)
                 throw AuthenticationExceptions.UserInvalidException;
@@ -120,9 +148,10 @@ namespace HanimeliApp.Application.Services
                 operationResultModel.Nickname = cook.Name;
                 operationResultModel.Address = cook.Address;
             }
+
             return operationResultModel;
         }
-        
+
         private string GenerateToken(List<Claim> claims)
         {
             var authSigninKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]!));
@@ -148,19 +177,20 @@ namespace HanimeliApp.Application.Services
 
             return tokenHandler.WriteToken(token);
         }
-        
+
         public async Task<List<UserModel>> GetB2BUserList(int pageNumber, int pageSize)
         {
             var paging = new EntityPaging();
             paging.PageNumber = pageNumber;
             paging.ItemCount = pageSize;
-            var entities = await UnitOfWork.Repository<User>().GetListAsync(x => x.Role == Roles.B2B, x => x.OrderBy(y => y.Id), paging: paging);
+            var entities = await UnitOfWork.Repository<User>()
+                .GetListAsync(x => x.Role == Roles.B2B, x => x.OrderBy(y => y.Id), paging: paging);
             var models = Mapper.Map<List<UserModel>>(entities);
             return models;
         }
-        
+
         public async Task<UserModel> GetB2BUserSettings(int userId)
-        {           
+        {
             var userRepository = UnitOfWork.Repository<User>();
             var user = await userRepository.GetAsync(x => x.Id == userId && x.Role == Roles.B2B);
 
@@ -170,7 +200,7 @@ namespace HanimeliApp.Application.Services
             var userModel = Mapper.Map<User, UserModel>(user);
             return userModel;
         }
-        
+
         public async Task<UserModel> UpdateB2BUserSettings(UpdateB2BUserSettingsRequest request)
         {
             var userRepository = UnitOfWork.Repository<User>();
@@ -179,8 +209,8 @@ namespace HanimeliApp.Application.Services
 
             if (user == null)
                 throw ValidationExceptions.InvalidUser;
-            
-            
+
+
             Mapper.Map(request, user);
             userRepository.Update(user);
             await UnitOfWork.SaveChangesAsync();

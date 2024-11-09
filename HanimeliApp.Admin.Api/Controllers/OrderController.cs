@@ -64,4 +64,12 @@ public class OrderController : BaseController
         await _orderService.AssignB2BOrders(request);
         return Result.AsSuccess("Ok");
     }
+    
+    [Authorize(Policy = "AdminPolicy")]
+    [HttpPut("{cookId:int}")]
+    public virtual async Task<Result> UnassignB2BOrders(int cookId)
+    {
+        await _orderService.UnassignB2BOrders(cookId);
+        return Result.AsSuccess("Ok");
+    }
 }

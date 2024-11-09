@@ -7,6 +7,7 @@ using HanimeliApp.Domain.Dtos.Food;
 using HanimeliApp.Domain.Entities;
 using HanimeliApp.Domain.Models.Food;
 using HanimeliApp.Domain.UnitOfWorks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HanimeliApp.Admin.Api.Controllers;
@@ -20,6 +21,7 @@ public class FoodController : CrudBaseController<FoodService, Food, FoodModel, C
         _azureStorageHelper = azureStorageHelper;
     }
 
+    [Authorize(Policy = "AdminPolicy")]
     [HttpPost]
     public async Task<Result<FoodModel>> CreateWithImage([FromForm] CreateFoodRequest request, IFormFile imageFile)
     {
@@ -28,6 +30,7 @@ public class FoodController : CrudBaseController<FoodService, Food, FoodModel, C
     }
 
 
+    [Authorize(Policy = "AdminPolicy")]
     [HttpPut("{id:int}")]
     public virtual async Task<Result<FoodModel>> UpdateWithImage(int id, [FromForm] UpdateFoodRequest request, IFormFile imageFile)
     {

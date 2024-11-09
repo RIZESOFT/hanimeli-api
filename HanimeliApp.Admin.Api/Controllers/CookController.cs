@@ -9,6 +9,7 @@ using HanimeliApp.Domain.Entities;
 using HanimeliApp.Domain.Models.Cook;
 using HanimeliApp.Domain.Models.Food;
 using HanimeliApp.Domain.UnitOfWorks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HanimeliApp.Admin.Api.Controllers;
@@ -19,6 +20,7 @@ public class CookController : CrudBaseController<CookService, Cook, CookModel, C
     {
     }
 
+    [Authorize(Policy = "AdminPolicy")]
     [HttpPost]
     public async Task<Result<CookModel>> CreateWithImage([FromForm] CreateCookRequest request, IFormFile imageFile)
     {
@@ -27,6 +29,7 @@ public class CookController : CrudBaseController<CookService, Cook, CookModel, C
     }
 
 
+    [Authorize(Policy = "AdminPolicy")]
     [HttpPut("{id:int}")]
     public virtual async Task<Result<CookModel>> UpdateWithImage(int id, [FromForm] UpdateCookRequest request, IFormFile imageFile)
     {

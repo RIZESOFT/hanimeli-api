@@ -7,6 +7,7 @@ using HanimeliApp.Application.Utilities;
 using HanimeliApp.Domain.Dtos.Menu;
 using HanimeliApp.Domain.Entities;
 using HanimeliApp.Domain.Models.Menu;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HanimeliApp.Admin.Api.Controllers;
@@ -19,6 +20,7 @@ public class MenuController : CrudBaseController<MenuService, Menu, MenuModel, C
         _azureStorageHelper = azureStorageHelper;
     }
 
+    [Authorize(Policy = "AdminPolicy")]
     [HttpPost]
     public async Task<Result<MenuModel>> CreateWithImage([FromForm] CreateMenuRequest request, IFormFile imageFile)
     {
@@ -27,6 +29,7 @@ public class MenuController : CrudBaseController<MenuService, Menu, MenuModel, C
     }
 
 
+    [Authorize(Policy = "AdminPolicy")]
     [HttpPut("{id:int}")]
     public virtual async Task<Result<MenuModel>> UpdateWithImage(int id, [FromForm] UpdateMenuRequest request, IFormFile imageFile)
     {

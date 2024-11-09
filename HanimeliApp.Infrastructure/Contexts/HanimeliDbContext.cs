@@ -25,4 +25,13 @@ public class HanimeliDbContext : DbContext
     {
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
     }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.Cook)
+            .WithOne(c => c.User)
+            .HasForeignKey<User>(u => u.CookId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
 }

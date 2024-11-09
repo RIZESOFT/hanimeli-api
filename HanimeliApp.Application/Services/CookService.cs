@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using HanimeliApp.Application.Exceptions;
 using HanimeliApp.Application.Services.Abstract;
+using HanimeliApp.Application.Utilities;
 using HanimeliApp.Domain.Dtos.Beverage;
 using HanimeliApp.Domain.Dtos.Cook;
 using HanimeliApp.Domain.Dtos.Food;
@@ -46,6 +47,20 @@ public class CookService : ServiceBase<Cook, CookModel, CreateCookRequest, Updat
         await userRepository.InsertAsync(user);
         await UnitOfWork.SaveChangesAsync();
         var model = Mapper.Map<CookModel>(user.Cook);
+        return model;
+    }
+
+    public override async Task<CookModel?> GetById(int id)
+    {
+        var cook = await UnitOfWork.Repository<Cook>().GetAsync(x => x.Id == id, includes: x => x.Include(y => y.User));
+        var model = Mapper.Map<CookModel>(cook);
+        if (model == null) return model;
+        
+        var orderItems = await UnitOfWork.Repository<OrderItem>().GetListAsync(x => x.CookId == id && x.Status == OrderItemStatus.AssignedToCook,
+            includes: orderItem => orderItem.Include(y => y.Menu).ThenInclude(y => y.Foods)
+                .Include(y => y.Menu).ThenInclude(y => y.Beverages));
+        
+        model.AssignedActiveOrderItems = orderItems.GroupOrderItemsForUi();
         return model;
     }
 
@@ -157,7 +172,7 @@ public class CookService : ServiceBase<Cook, CookModel, CreateCookRequest, Updat
 
         if (order.OrderItems.All(x => x.Status == OrderItemStatus.Completed))
         {
-            order.Status = OrderStatus.AssignedToCook;
+            order.Status = OrderStatus.DeliveredToCourier;
             UnitOfWork.Repository<Order>().Update(order);
         }
         await UnitOfWork.SaveChangesAsync();

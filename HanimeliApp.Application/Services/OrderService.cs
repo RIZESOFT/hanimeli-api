@@ -157,21 +157,30 @@ public class OrderService : ServiceBase
                                                     && x.DeliveryDate <= endDate
                                                     && x.User.Role == Roles.B2B
                                                     && x.OrderItems.Any(y => !y.CookId.HasValue);
+
         var orders = await UnitOfWork.Repository<Order>().GetListAsync(filter, x => x.OrderBy(y => y.UserId),
-            includes: x => x.Include(y => y.OrderItems));
+            includes: x => x.Include(y => y.OrderItems)
+                            .ThenInclude(oi => oi.Menu)); 
 
         var list = new List<AssigmentOrderModel>();
+
         var groupedOrders = orders.GroupBy(x => x.DeliveryDate!.Value.Date);
+
         foreach (var groupedOrder in groupedOrders)
         {
-            var hourlyMenus = groupedOrder.GroupBy(x => $"{x.DeliveryDate!.Value.Hour}:{x.DeliveryDate.Value.Minute}").Select(x =>
-            {
-                return new
+            var hourlyMenus = groupedOrder.GroupBy(x => $"{x.DeliveryDate!.Value.Hour}:{x.DeliveryDate.Value.Minute}")
+                .Select(x =>
                 {
-                    Hour = x.Key,
-                    MenuIds = x.SelectMany(y => y.OrderItems.Where(z => !z.CookId.HasValue).Select(z => z.MenuId!.Value)).ToList()
-                };
-            }).ToList();
+                    return new
+                    {
+                        Hour = x.Key,
+                        MenuItems = x.SelectMany(y => y.OrderItems
+                            .Where(z => !z.CookId.HasValue)
+                            .Select(z => z.Menu))
+                            .ToList()
+                    };
+                }).ToList();
+
             var item = new AssigmentOrderModel
             {
                 DayName = groupedOrder.Key.ToString("dddd", CultureInfo.CurrentUICulture),
@@ -179,17 +188,20 @@ public class OrderService : ServiceBase
                 Hours = hourlyMenus.Select(x => new AssigmentOrderHourModel
                 {
                     Hour = x.Hour,
-                    Menus = x.MenuIds.GroupBy(y => y).Select(y => new AssigmentOrderHourMenuModel()
-                    {
-                        MenuId = y.Key,
-                        Count = y.Count(),
-                    }).ToList()
+                    Menus = x.MenuItems.GroupBy(y => y.Id)
+                        .Select(y => new AssigmentOrderHourMenuModel()
+                        {
+                            MenuId = y.Key,
+                            MenuName = y.First().Name, 
+                            Count = y.Count()
+                        }).ToList()
                 }).ToList()
             };
             list.Add(item);
         }
         return list;
     }
+
 
     public async Task AssignB2BOrders(AssignB2BOrdersRequest request)
     {

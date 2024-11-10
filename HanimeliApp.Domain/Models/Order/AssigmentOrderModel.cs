@@ -16,5 +16,6 @@ public class AssigmentOrderHourModel
 public class AssigmentOrderHourMenuModel
 {
     public int MenuId { get; set; }
+    public string MenuName { get; set; }
     public int Count { get; set; }
 }

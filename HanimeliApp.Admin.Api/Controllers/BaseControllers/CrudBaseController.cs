@@ -27,7 +27,7 @@ public class CrudBaseController<TService, TEntity, TModel, TCreateRequest, TUpda
 
     [Authorize(Policy = "AdminPolicy")]
     [HttpGet]
-    public async Task<Result<List<TModel>>> GetList([FromQuery] int pageNumber)
+    public virtual async Task<Result<List<TModel>>> GetList([FromQuery] int pageNumber)
     {
         var models = await Service.GetList(x => true, pageNumber, 25);
         return Result.AsSuccess(models);

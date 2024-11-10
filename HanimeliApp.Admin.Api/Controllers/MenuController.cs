@@ -19,7 +19,15 @@ public class MenuController : CrudBaseController<MenuService, Menu, MenuModel, C
     {
         _azureStorageHelper = azureStorageHelper;
     }
-
+    
+    [AllowAnonymous]
+    [HttpGet]
+    public override async Task<Result<List<MenuModel>>> GetList([FromQuery] int pageNumber)
+    {
+        var models = await Service.GetList(x => true, pageNumber, 25);
+        return Result.AsSuccess(models);
+    }
+    
     [Authorize(Policy = "AdminPolicy")]
     [HttpPost]
     public async Task<Result<MenuModel>> CreateWithImage([FromForm] CreateMenuRequest request, IFormFile imageFile)

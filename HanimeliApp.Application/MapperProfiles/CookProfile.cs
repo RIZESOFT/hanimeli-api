@@ -20,6 +20,34 @@ public class CookProfile : Profile
         CreateMap<CreateCookRequest, Cook>()
             .ForMember(o => o.Name, opt => opt.MapFrom(o => o.Nickname));
         CreateMap<UpdateCookRequest, Cook>()
+            .ForMember(o => o.Name, opt =>
+            {
+                opt.Condition(src => !string.IsNullOrEmpty(src.Nickname));
+                opt.MapFrom(o => o.Nickname);
+            })
+            .ForPath(o => o.User.LastName, opt =>
+            {
+                opt.Condition(src => !string.IsNullOrEmpty(src.SourceMember));
+                opt.MapFrom(o => o.LastName);
+            })
+            .ForPath(o => o.User.Email, opt =>
+            {
+                opt.Condition(src => !string.IsNullOrEmpty(src.SourceMember));
+                opt.MapFrom(o => o.Email);
+            })
+            .ForPath(o => o.User.Phone, opt =>
+            {
+                opt.Condition(src => !string.IsNullOrEmpty(src.SourceMember));
+
+                opt.MapFrom(o => o.Phone);
+            })
+            .ForPath(o => o.User.Name, opt =>
+            {
+                opt.Condition(src => !string.IsNullOrEmpty(src.SourceMember));
+
+                opt.MapFrom(o => o.Name);
+            })
+            .ForPath(o => o.User.Id, opt => opt.Ignore())
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
     }
 }

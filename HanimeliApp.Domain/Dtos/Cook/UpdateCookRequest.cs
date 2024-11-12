@@ -1,9 +1,11 @@
-﻿namespace HanimeliApp.Domain.Dtos.Cook;
+﻿using HanimeliApp.Domain.Dtos.User;
 
-public class UpdateCookRequest
+namespace HanimeliApp.Domain.Dtos.Cook;
+
+public class UpdateCookRequest : UpdateUserRequest
 {
     
-    public string Name { get; set; }
+    public string Nickname { get; set; }
     public string? Bio { get; set; }
     public string? Iban { get; set; }
     public string? Address { get; set; }

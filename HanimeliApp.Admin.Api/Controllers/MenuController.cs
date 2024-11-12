@@ -20,7 +20,6 @@ public class MenuController : CrudBaseController<MenuService, Menu, MenuModel, C
         _azureStorageHelper = azureStorageHelper;
     }
     
-    [AllowAnonymous]
     [HttpGet]
     public override async Task<Result<List<MenuModel>>> GetList([FromQuery] int pageNumber)
     {

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq.Expressions;
+using AutoMapper;
 using HanimeliApp.Application.Exceptions;
 using HanimeliApp.Application.Services.Abstract;
 using HanimeliApp.Application.Utilities;
@@ -8,6 +9,7 @@ using HanimeliApp.Domain.Dtos.Food;
 using HanimeliApp.Domain.Entities;
 using HanimeliApp.Domain.Entities.Abstract;
 using HanimeliApp.Domain.Enums;
+using HanimeliApp.Domain.Models;
 using HanimeliApp.Domain.Models.Beverage;
 using HanimeliApp.Domain.Models.Cook;
 using HanimeliApp.Domain.Models.Food;
@@ -50,6 +52,29 @@ public class CookService : ServiceBase<Cook, CookModel, CreateCookRequest, Updat
         return model;
     }
 
+    public override async Task<CookModel> Update(int id, UpdateCookRequest request)
+    {
+        var cookRepository = UnitOfWork.Repository<Cook>();
+        var cook = await cookRepository.GetAsync(x => x.Id == id, includes: x => x.Include(y => y.User));
+
+        if (cook == null)
+            throw ValidationExceptions.InvalidUser;
+        
+        Mapper.Map(request, cook);
+        if (!string.IsNullOrEmpty(request.Password))
+        {
+            var hasher = new PasswordHasher<object>();
+            var dummyUser = new object();
+            var hashedPassword = hasher.HashPassword(dummyUser, request.Password);
+            cook.User.Password = hashedPassword;
+        }
+        
+        cookRepository.Update(cook);
+        await UnitOfWork.SaveChangesAsync();
+        var model = Mapper.Map<CookModel>(cook);
+        return model;
+    }
+
     public override async Task<CookModel?> GetById(int id)
     {
         var cook = await UnitOfWork.Repository<Cook>().GetAsync(x => x.Id == id, includes: x => x.Include(y => y.User));
@@ -62,6 +87,26 @@ public class CookService : ServiceBase<Cook, CookModel, CreateCookRequest, Updat
         
         model.AssignedActiveOrderItems = orderItems.GroupOrderItemsForUi();
         return model;
+    }
+
+    public override async Task<List<CookModel>> GetList(Expression<Func<Cook, bool>> filter, int pageNumber, int pageSize)
+    {
+        var paging = new EntityPaging();
+        paging.PageNumber = pageNumber;
+        paging.ItemCount = pageSize;
+        var cooks = await UnitOfWork.Repository<Cook>().GetListAsync(filter, x => x.OrderBy(y => y.Id), paging: paging, includes: x => x.Include(y => y.User));
+        var cookIds = cooks.Select(x => x.Id).ToList();
+        var allOrderItems = await UnitOfWork.Repository<OrderItem>().GetListAsync(
+            x => x.CookId.HasValue && cookIds.Contains(x.CookId.Value) && x.Status == OrderItemStatus.AssignedToCook,
+            includes: orderItem => orderItem.Include(y => y.Menu).ThenInclude(y => y.Foods)
+                .Include(y => y.Menu).ThenInclude(y => y.Beverages));
+        var models = Mapper.Map<List<CookModel>>(cooks);
+        var menuAssignedModels = models.Where(x => allOrderItems.Any(y => y.CookId == x.Id)).ToList();
+        foreach (var model in menuAssignedModels)
+        {
+            model.AssignedActiveOrderItems = allOrderItems.Where(x => x.CookId == model.Id).GroupOrderItemsForUi();
+        }
+        return models;
     }
 
     public async Task<CookModel> CreateWithImage(CreateCookRequest request, IFormFile imageFile)

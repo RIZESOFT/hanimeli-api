@@ -49,8 +49,19 @@ public class MenuController : CrudBaseController<MenuService, Menu, MenuModel, C
 
     [Authorize(Policy = "AdminPolicy")]
     [HttpPut("{id:int}")]
-    public virtual async Task<Result<MenuModel>> UpdateWithImage(int id, [FromForm] UpdateMenuRequest request, IFormFile imageFile)
+    public virtual async Task<Result<MenuModel>> UpdateWithImage(int id, IFormCollection collection, IFormFile imageFile)
     {
+        var foodIds = collection["FoodIds[]"].Select(int.Parse).ToList();
+        var beverageIds = collection["BeverageIds[]"].Select(int.Parse).ToList();
+        var request = new UpdateMenuRequest()
+        {
+            Name = collection["Name"],
+            Description = collection["Description"],
+            Price = decimal.Parse(collection["Price"]),
+            FoodIds = foodIds,
+            BeverageIds = beverageIds
+        };
+        
         var model = await Service.UpdateWithImage(id, request, imageFile);
         return Result.AsSuccess(model);
     }

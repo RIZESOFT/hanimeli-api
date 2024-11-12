@@ -29,8 +29,19 @@ public class MenuController : CrudBaseController<MenuService, Menu, MenuModel, C
     
     [Authorize(Policy = "AdminPolicy")]
     [HttpPost]
-    public async Task<Result<MenuModel>> CreateWithImage([FromForm] CreateMenuRequest request, IFormFile imageFile)
+    public async Task<Result<MenuModel>> CreateWithImage(IFormCollection collection, IFormFile imageFile)
     {
+        var foodIds = collection["FoodIds[]"].Select(int.Parse).ToList();
+        var beverageIds = collection["BeverageIds[]"].Select(int.Parse).ToList();
+        var request = new CreateMenuRequest
+        {
+            Name = collection["Name"],
+            Description = collection["Description"],
+            Price = decimal.Parse(collection["Price"]),
+            FoodIds = foodIds,
+            BeverageIds = beverageIds
+        };
+
         var model = await Service.CreateWithImage(request, imageFile);
         return Result.AsSuccess(model);
     }

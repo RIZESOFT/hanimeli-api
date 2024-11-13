@@ -167,7 +167,7 @@ public class CookService : ServiceBase<Cook, CookModel, CreateCookRequest, Updat
                                                 order.Include(y => y.OrderItems).ThenInclude(y => y.Menu).ThenInclude(y => y.Foods)
                                                 .Include(y => y.OrderItems).ThenInclude(y => y.Menu).ThenInclude(y => y.Beverages)
                                             );
-        var completedMenus = await UnitOfWork.Repository<OrderItem>().CountAsync(x => x.Order.DeliveryDate.Value.Date == DateTime.Now.Date && x.Status == OrderItemStatus.Completed);
+        var completedMenus = await UnitOfWork.Repository<OrderItem>().CountAsync(x => x.CookId == user!.CookId && x.Order.DeliveryDate.Value.Date == DateTime.Now.Date && x.Status == OrderItemStatus.Completed);
         if (userOrders.Count != 0)
         {
             model.NextOrder = Mapper.Map<OrderModel>(userOrders.FirstOrDefault());

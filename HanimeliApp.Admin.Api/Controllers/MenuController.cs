@@ -65,4 +65,12 @@ public class MenuController : CrudBaseController<MenuService, Menu, MenuModel, C
         var model = await Service.UpdateWithImage(id, request, imageFile);
         return Result.AsSuccess(model);
     }
+    
+    [Authorize(Policy = "AdminPolicy")]
+    [HttpPut("{id:int}")]
+    public async Task<Result> ToggleActiveStatus(int id)
+    {
+        await Service.ToggleActiveStatus(id);
+        return Result.AsSuccess();
+    }
 }

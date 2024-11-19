@@ -130,4 +130,18 @@ public class MenuService : ServiceBase<Menu, MenuModel, CreateMenuRequest, Updat
         var model = Mapper.Map<MenuModel>(entity);
         return model;
     }
+    
+    public async Task ToggleActiveStatus(int id)
+    {
+        var entity = await UnitOfWork.Repository<Menu>().GetAsync(x => x.Id == id);
+        if (entity == null)
+            throw ValidationExceptions.RecordNotFound;
+
+        entity.IsActive = !entity.IsActive;
+
+        UnitOfWork.Repository<Menu>().Update(entity);
+        await UnitOfWork.SaveChangesAsync();
+    }
+
+    
 }
